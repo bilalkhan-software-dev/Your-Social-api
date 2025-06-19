@@ -26,7 +26,7 @@ public class UserController implements UserControllerEndpoint {
 
         userService.deleteUser(userId);
 
-        return response.createBuildResponseMessage("user deleted successfully!", HttpStatus.OK);
+        return response.createBuildResponseMessage("account deleted successfully!", HttpStatus.OK);
     }
 
     @Override
@@ -48,7 +48,7 @@ public class UserController implements UserControllerEndpoint {
 
 
         if (CollectionUtils.isEmpty(searchedUser)) {
-            return response.createBuildResponseMessage("no result found with query :" + query, HttpStatus.BAD_REQUEST);
+            return response.createBuildResponseMessage("no result found with query: " + query, HttpStatus.BAD_REQUEST);
         }
         return response.createBuildResponse(searchedUser, HttpStatus.OK);
     }
@@ -58,7 +58,7 @@ public class UserController implements UserControllerEndpoint {
 
         boolean b = userService.updateUser(userRequest);
         if (b) {
-            return response.createBuildResponseMessage("user updated successfully!", HttpStatus.OK);
+            return response.createBuildResponseMessage("user account updated successfully!", HttpStatus.OK);
         }
 
         return response.createErrorResponseMessage("update failed", HttpStatus.BAD_REQUEST);

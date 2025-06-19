@@ -1,8 +1,11 @@
 package com.yoursocial.util;
 
+import com.yoursocial.config.security.CustomUserDetails;
+import com.yoursocial.entity.User;
 import com.yoursocial.handler.GenericResponse;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 
 @Component
@@ -42,10 +45,21 @@ public class CommonUtil {
     public ResponseEntity<?> createErrorResponseMessage(String message, HttpStatus httpStatusCode) {
         GenericResponse response = GenericResponse.builder()
                 .responseStatusCode(httpStatusCode)
-                .status("success")
+                .status("failed!")
                 .message(message)
                 .build();
         return response.create();
+    }
+
+    public User GetLoggedInUserDetails(){
+        try {
+
+            CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+
+            return userDetails.getUser();
+        }catch (Exception e){
+            throw e;
+        }
     }
 
 }
