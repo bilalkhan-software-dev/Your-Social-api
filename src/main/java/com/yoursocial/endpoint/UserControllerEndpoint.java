@@ -7,11 +7,11 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api/v1/user") // required authentication
 public interface UserControllerEndpoint {
 
-    @DeleteMapping("/delete/{userId}")
+    @DeleteMapping("/delete/{userId}") //  for admin
     public ResponseEntity<?> deleteUser(@PathVariable Integer userId);
 
 
-    @GetMapping("/all")
+    @GetMapping("/all") // for admin
     public ResponseEntity<?> getAllUsers();
 
     @GetMapping("/search/{query}")

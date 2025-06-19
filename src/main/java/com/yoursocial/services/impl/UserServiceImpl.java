@@ -6,6 +6,7 @@ import com.yoursocial.entity.User;
 import com.yoursocial.exception.ResourceNotFoundException;
 import com.yoursocial.repository.UserRepository;
 import com.yoursocial.services.UserService;
+import com.yoursocial.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
@@ -19,12 +20,13 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepo;
     private final ModelMapper mapper;
+    private final CommonUtil util;
 
     @Override
     public UserResponse findUserById(Integer userId) {
 
         User isUserFound = userRepo.findById(userId).orElseThrow(
-                () -> new ResourceNotFoundException("User not available or created with id : " + userId)
+                () -> new ResourceNotFoundException("User not available or created with id: " + userId)
         );
         UserResponse userResponse = mapper.map(isUserFound, UserResponse.class);
 
@@ -35,7 +37,7 @@ public class UserServiceImpl implements UserService {
     public UserResponse findUserByEmail(String email) {
 
         User isUserFound = userRepo.findByEmail(email).orElseThrow(
-                () -> new ResourceNotFoundException("User not available or created with email : " + email)
+                () -> new ResourceNotFoundException("User not available or created with email: " + email)
         );
 
         UserResponse userResponse = mapper.map(isUserFound, UserResponse.class);
@@ -46,12 +48,21 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean updateUser(UpdateUserRequest userRequest) {
 
-        Integer userId = 1;
+        Integer userId = util.GetLoggedInUserDetails().getId();
         User existingUser = userRepo.findById(userId).orElseThrow(
                 () -> new ResourceNotFoundException("User not found with id:" + userId)
         );
 
-        mapper.map(userRequest, existingUser);
+
+        if (userRequest.getFirstName() != null) {
+            existingUser.setFirstName(userRequest.getFirstName());
+        }
+        if (userRequest.getLastName() != null) {
+            existingUser.setLastName(userRequest.getLastName());
+        }
+        if (userRequest.getGender() != null) {
+            existingUser.setGender(userRequest.getGender());
+        }
 
         User isUpdated = userRepo.save(existingUser);
 
@@ -81,18 +92,25 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean followUser(Integer userId) {
 
-        Integer loggedInUserId = 1;  // login user wants to follow other users and userId is which is the user wants to follow
+        Integer loggedInUserId = util.GetLoggedInUserDetails().getId();  // login user wants to follow other users and userId is which is the user wants to follow
 
         User requestedUser = userRepo.findById(loggedInUserId).orElseThrow(
-                () -> new ResourceNotFoundException("user not found with id :" + loggedInUserId)
+                () -> new ResourceNotFoundException("user not found with id:" + loggedInUserId)
         );
         User user = userRepo.findById(userId).orElseThrow(
-                () -> new ResourceNotFoundException("user not found with id :" + userId)
+                () -> new ResourceNotFoundException("user not found with id:" + userId)
         );
+
+        if (loggedInUserId.equals(userId)) {
+            throw new IllegalArgumentException("you can't follow yourself");
+        }
 
         boolean addFollower = requestedUser.getFollowing().add(user.getId());// increase following
         boolean addFollowing = user.getFollowers().add(requestedUser.getId());// increase followers
 
+
+        userRepo.save(requestedUser);
+        userRepo.save(user);
         return addFollower && addFollowing ? true : false;
     }
 
@@ -100,6 +118,7 @@ public class UserServiceImpl implements UserService {
     public List<UserResponse> searchUser(String query) {
 
         List<User> searchedUser = userRepo.searchUser(query);
+
 
         return searchedUser.stream().map(user -> mapper.map(user, UserResponse.class)).toList();
     }

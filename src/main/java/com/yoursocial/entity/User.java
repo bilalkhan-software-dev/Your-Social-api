@@ -31,8 +31,10 @@ public class User {
 
     private String gender;
 
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<Integer> followers = new ArrayList<>();
 
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<Integer> following = new ArrayList<>();
 
 }

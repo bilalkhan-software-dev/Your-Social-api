@@ -1,0 +1,45 @@
+spring:
+  application:
+    name: Your Social
+  profiles:
+    active:  ${ACTIVE_PROFILE:dev}
+
+server:
+  port: 8081
+
+---
+# dev Profile Configuration
+spring:
+  config:
+    activate:
+      on-profile: dev
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${SQL_URL:jdbc:mysql://localhost:3306/your-social}
+    username: ${SQL_USERNAME}
+    password: ${SQL_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+        format_sql: true
+  mail:
+    host: smtp.gmail.com
+    username: ${EMAIL_USERNAME:bilalkhan.devse@gmail.com}
+    password: ${EMAIL_PASSWORD}
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
+# custom properties for verify email url
+website:
+  base:
+    url: ${BASE_URL:http://localhost:8081}
+
+---
