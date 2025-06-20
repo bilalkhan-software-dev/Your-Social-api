@@ -1,10 +1,7 @@
 package com.yoursocial.services.impl;
 
 import com.yoursocial.config.security.CustomUserDetails;
-import com.yoursocial.dto.LoginRequest;
-import com.yoursocial.dto.LoginResponse;
-import com.yoursocial.dto.UserRequest;
-import com.yoursocial.dto.UserResponse;
+import com.yoursocial.dto.*;
 import com.yoursocial.entity.User;
 import com.yoursocial.exception.ExistDataException;
 import com.yoursocial.repository.UserRepository;
@@ -34,8 +31,8 @@ public class AuthServiceImpl implements AuthService {
 
 
         boolean isExist = userRepository.existsByEmail(user.getEmail());
-        if (isExist){
-            throw new ExistDataException("account already registered with username:"+user.getEmail() + ". Please try with another email!");
+        if (isExist) {
+            throw new ExistDataException("account already registered with username:" + user.getEmail() + ". Please try with another email!");
         }
 
         User mappedUser = mapper.map(user, User.class);
@@ -47,7 +44,6 @@ public class AuthServiceImpl implements AuthService {
     }
 
 
-
     @Override
     public LoginResponse login(LoginRequest user) {
 
@@ -55,17 +51,19 @@ public class AuthServiceImpl implements AuthService {
         String password = user.getPassword();
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
-        if (authenticate.isAuthenticated()){
+        if (authenticate.isAuthenticated()) {
             CustomUserDetails userDetails = (CustomUserDetails) authenticate.getPrincipal();
 
             String token = jwtService.generateToken(userDetails.getUser());
 
+            User detailsUser = userDetails.getUser();
             return LoginResponse.builder()
-                    .userDetails(mapper.map(userDetails.getUser(), UserResponse.class))
+                    .userDetails(UserServiceImpl.getUserResponse(detailsUser))
                     .token(token)
                     .build();
         }
-
         return null;
     }
+
+
 }

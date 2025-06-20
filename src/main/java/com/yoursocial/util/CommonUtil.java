@@ -51,7 +51,7 @@ public class CommonUtil {
         return response.create();
     }
 
-    public User GetLoggedInUserDetails(){
+    public User getLoggedInUserDetails(){
         try {
 
             CustomUserDetails userDetails = (CustomUserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
