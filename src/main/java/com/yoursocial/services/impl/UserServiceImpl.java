@@ -1,5 +1,6 @@
 package com.yoursocial.services.impl;
 
+import com.yoursocial.dto.PostResponse;
 import com.yoursocial.dto.UpdateUserRequest;
 import com.yoursocial.dto.UserResponse;
 import com.yoursocial.entity.User;
@@ -25,30 +26,28 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse findUserById(Integer userId) {
 
-        User isUserFound = userRepo.findById(userId).orElseThrow(
+        User user = userRepo.findById(userId).orElseThrow(
                 () -> new ResourceNotFoundException("User not available or created with id: " + userId)
         );
-        UserResponse userResponse = mapper.map(isUserFound, UserResponse.class);
 
-        return !ObjectUtils.isEmpty(userResponse) ? userResponse : null;
+        return getUserResponse(user);
     }
 
     @Override
     public UserResponse findUserByEmail(String email) {
 
-        User isUserFound = userRepo.findByEmail(email).orElseThrow(
+        User user = userRepo.findByEmail(email).orElseThrow(
                 () -> new ResourceNotFoundException("User not available or created with email: " + email)
         );
 
-        UserResponse userResponse = mapper.map(isUserFound, UserResponse.class);
-
-        return !ObjectUtils.isEmpty(userResponse) ? userResponse : null;
+        return getUserResponse(user);
     }
+
 
     @Override
     public boolean updateUser(UpdateUserRequest userRequest) {
 
-        Integer userId = util.GetLoggedInUserDetails().getId();
+        Integer userId = util.getLoggedInUserDetails().getId();
         User existingUser = userRepo.findById(userId).orElseThrow(
                 () -> new ResourceNotFoundException("User not found with id:" + userId)
         );
@@ -74,8 +73,9 @@ public class UserServiceImpl implements UserService {
 
         List<User> userList = userRepo.findAll();
 
-        return userList.stream().map(user -> mapper.map(user, UserResponse.class)).toList();
-
+        return userList.stream().map(UserServiceImpl::getUserResponse
+                )
+                .toList();
     }
 
     @Override
@@ -92,7 +92,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean followUser(Integer userId) {
 
-        Integer loggedInUserId = util.GetLoggedInUserDetails().getId();  // login user wants to follow other users and userId is which is the user wants to follow
+        Integer loggedInUserId = util.getLoggedInUserDetails().getId();  // login user wants to follow other users and userId is which is the user wants to follow
 
         User requestedUser = userRepo.findById(loggedInUserId).orElseThrow(
                 () -> new ResourceNotFoundException("user not found with id:" + loggedInUserId)
@@ -119,7 +119,29 @@ public class UserServiceImpl implements UserService {
 
         List<User> searchedUser = userRepo.searchUser(query);
 
+        return searchedUser.stream().map(UserServiceImpl::getUserResponse).toList();
+    }
 
-        return searchedUser.stream().map(user -> mapper.map(user, UserResponse.class)).toList();
+
+    public static UserResponse getUserResponse(User user) {
+        return UserResponse.builder()
+                .id(user.getId())
+                .gender(user.getGender())
+                .email(user.getEmail())
+                .firstName(user.getFirstName())
+                .lastName(user.getLastName())
+                .following(user.getFollowing())
+                .followers(user.getFollowers())
+                .savedPost(user.getSavedPost().stream().map(post -> PostResponse.builder()
+                        .postId(post.getId())
+                        .image(post.getImage())
+                        .video(post.getVideo())
+                        .caption(post.getCaption())
+                        .likedByUserIds(post.getLike().stream().map(User::getId).toList())
+                        .createdAt(post.getCreatedAt())
+                        .authorId(post.getId())
+                        .authorEmail(post.getUser().getEmail())
+                        .build()).toList())
+                .build();
     }
 }

@@ -3,6 +3,7 @@ package com.yoursocial.entity;
 
 import jakarta.persistence.*;
 import lombok.*;
+import org.springframework.security.access.method.P;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -36,5 +37,10 @@ public class User {
 
     @ElementCollection(fetch = FetchType.EAGER)
     private List<Integer> following = new ArrayList<>();
+
+    @ManyToMany
+    private List<Post> savedPost = new ArrayList<>();
+
+
 
 }
