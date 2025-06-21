@@ -58,7 +58,7 @@ public class PostServiceImpl implements PostService {
 
         // Check if the post belongs to the authenticated user
         if (!post.getUser().getId().equals(userId)) {
-            throw new IllegalArgumentException("This post is not created by you");
+            throw new IllegalArgumentException("you can't delete another user post");
         }
 
         postRepository.delete(post);
