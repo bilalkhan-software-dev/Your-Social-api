@@ -33,7 +33,7 @@ public class CommentServiceImpl implements CommentService {
 
 
     @Override
-    public boolean commentCreated(CommentRequest commentRequest, Integer postId) {
+    public boolean createComment(CommentRequest commentRequest, Integer postId) {
 
         User isUserLoggedIn = util.getLoggedInUserDetails();
 
