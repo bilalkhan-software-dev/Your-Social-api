@@ -1,6 +1,5 @@
 package com.yoursocial.entity;
 
-
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -16,29 +15,23 @@ import java.util.List;
 @Getter
 @Setter
 @Entity
-public class Post {
+public class Comment {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     @Lob
-    private String caption;
+    private String content;
 
-    private String image;
-
-    private String video;
-
-    @ManyToOne(cascade = CascadeType.ALL,fetch = FetchType.EAGER)
+    @ManyToOne
     private User user;
 
-    @OneToMany
-    private List<User> like = new ArrayList<>();
+    private List<User> liked = new ArrayList<>();
 
-    @OneToMany
-    private List<Comment> comments = new ArrayList<>();
+    private LocalDateTime commentCreatedAt;
 
-    private LocalDateTime createdAt;
+
 
 
 

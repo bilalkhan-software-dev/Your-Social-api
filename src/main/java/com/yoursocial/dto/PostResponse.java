@@ -24,7 +24,36 @@ public class PostResponse {
     private String authorEmail;
 
     private List<Integer> likedByUserIds  = new ArrayList<>();
+    private List<CommentResponse> comments = new ArrayList<>();
     private LocalDateTime createdAt;
+
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    @Getter
+    @Setter
+    public static class CommentResponse{
+
+        private Integer commentId;
+        private String content;
+        private CommentUserDetails user;
+        private List<Integer> commentLikes = new ArrayList<>();
+
+    }
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    @Getter
+    @Setter
+    public static class CommentUserDetails{
+        private Integer id;
+        private String firstName;
+        private String email;
+
+
+    }
 
 
 

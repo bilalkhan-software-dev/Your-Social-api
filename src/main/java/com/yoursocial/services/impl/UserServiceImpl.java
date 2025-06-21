@@ -20,7 +20,6 @@ import java.util.List;
 public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepo;
-    private final ModelMapper mapper;
     private final CommonUtil util;
 
     @Override
@@ -139,7 +138,7 @@ public class UserServiceImpl implements UserService {
                         .caption(post.getCaption())
                         .likedByUserIds(post.getLike().stream().map(User::getId).toList())
                         .createdAt(post.getCreatedAt())
-                        .authorId(post.getId())
+                        .authorId(post.getUser().getId())
                         .authorEmail(post.getUser().getEmail())
                         .build()).toList())
                 .build();
