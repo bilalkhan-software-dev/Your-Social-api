@@ -29,6 +29,7 @@ public class StoryController implements StoryControllerEndpoint {
         if (isStoryAdded) {
             return response.createBuildResponseMessage("story added successfully!", HttpStatus.CREATED);
         }
+
         return response.createErrorResponseMessage("story added failed!", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
