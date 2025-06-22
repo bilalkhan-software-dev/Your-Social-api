@@ -4,6 +4,7 @@ package com.yoursocial.dto;
 import lombok.*;
 
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +26,28 @@ public class UserResponse {
     private List<Integer> following = new ArrayList<>();
 
     private List<PostResponse> savedPost = new ArrayList<>();
+
+
+    @AllArgsConstructor
+    @NoArgsConstructor
+    @Builder
+    @Getter
+    @Setter
+    public static class PostResponse {
+
+        private Integer postId;
+        private String caption;
+        private String image;
+        private String video;
+
+        private Integer authorId;
+        private String authorEmail;
+
+        private List<Integer> likedByUserIds = new ArrayList<>();
+        private LocalDateTime createdAt;
+
+
+    }
 
 
 }

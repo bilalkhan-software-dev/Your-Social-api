@@ -2,7 +2,7 @@ spring:
   application:
     name: Your Social
   profiles:
-    active:  ${ACTIVE_PROFILE:dev}
+    active: ${ACTIVE_PROFILE:dev}
 
 server:
   port: 8081
@@ -24,7 +24,6 @@ spring:
     properties:
       hibernate:
         show_sql: true
-        format_sql: true
   mail:
     host: smtp.gmail.com
     username: ${EMAIL_USERNAME:bilalkhan.devse@gmail.com}

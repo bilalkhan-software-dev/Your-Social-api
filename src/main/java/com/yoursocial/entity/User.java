@@ -8,39 +8,32 @@ import org.springframework.security.access.method.P;
 import java.util.ArrayList;
 import java.util.List;
 
-@AllArgsConstructor
-@NoArgsConstructor
-@Getter
-@Setter
-@Builder
 @Entity
 @Table(name = "users")
+@Data
 public class User {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
     private String firstName;
-
     private String lastName;
 
     @Column(unique = true)
     private String email;
-
     private String password;
-
     private String gender;
 
-    @ElementCollection(fetch = FetchType.EAGER)
+
+    @ElementCollection
     private List<Integer> followers = new ArrayList<>();
 
-    @ElementCollection(fetch = FetchType.EAGER)
+    @ElementCollection
     private List<Integer> following = new ArrayList<>();
 
     @ManyToMany
     private List<Post> savedPost = new ArrayList<>();
-
-
-
 }
+
+
+

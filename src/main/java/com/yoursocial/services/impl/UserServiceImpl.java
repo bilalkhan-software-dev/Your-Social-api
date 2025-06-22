@@ -1,15 +1,14 @@
 package com.yoursocial.services.impl;
 
-import com.yoursocial.dto.PostResponse;
 import com.yoursocial.dto.UpdateUserRequest;
 import com.yoursocial.dto.UserResponse;
+import com.yoursocial.dto.UserResponse.PostResponse;
 import com.yoursocial.entity.User;
 import com.yoursocial.exception.ResourceNotFoundException;
 import com.yoursocial.repository.UserRepository;
 import com.yoursocial.services.UserService;
 import com.yoursocial.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
-import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
@@ -91,27 +90,34 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean followUser(Integer userId) {
 
-        Integer loggedInUserId = util.getLoggedInUserDetails().getId();  // login user wants to follow other users and userId is which is the user wants to follow
-
-        User requestedUser = userRepo.findById(loggedInUserId).orElseThrow(
-                () -> new ResourceNotFoundException("user not found with id:" + loggedInUserId)
-        );
-        User user = userRepo.findById(userId).orElseThrow(
-                () -> new ResourceNotFoundException("user not found with id:" + userId)
-        );
+        Integer loggedInUserId = util.getLoggedInUserDetails().getId();
 
         if (loggedInUserId.equals(userId)) {
-            throw new IllegalArgumentException("you can't follow yourself");
+            throw new IllegalArgumentException("you can't follow/unfollow yourself");
         }
 
-        boolean addFollower = requestedUser.getFollowing().add(user.getId());// increase following
-        boolean addFollowing = user.getFollowers().add(requestedUser.getId());// increase followers
+        User follower = userRepo.findById(loggedInUserId)
+                .orElseThrow(() -> new ResourceNotFoundException("user not found with id: " + loggedInUserId));
+        User followee = userRepo.findById(userId)
+                .orElseThrow(() -> new ResourceNotFoundException("user not found with id: " + userId));
 
+        boolean isFollowing = follower.getFollowing().contains(userId);
 
-        userRepo.save(requestedUser);
-        userRepo.save(user);
-        return addFollower && addFollowing ? true : false;
+        if (isFollowing) {
+            follower.getFollowing().remove(userId);
+            followee.getFollowers().remove(loggedInUserId);
+        } else {
+            follower.getFollowing().add(userId);
+            followee.getFollowers().add(loggedInUserId);
+        }
+
+        userRepo.save(follower);
+        userRepo.save(followee);
+
+        // Returns true if now following, false if now unfollowed
+        return !isFollowing;
     }
+
 
     @Override
     public List<UserResponse> searchUser(String query) {

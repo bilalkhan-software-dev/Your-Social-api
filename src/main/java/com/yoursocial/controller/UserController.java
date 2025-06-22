@@ -75,7 +75,7 @@ public class UserController implements UserControllerEndpoint {
             return response.createBuildResponseMessage("successfully follow " + user.getFirstName() + " " + user.getLastName(), HttpStatus.OK);
         }
 
-        return response.createErrorResponseMessage("failed to follow " + user.getFirstName() + " " + user.getLastName(), HttpStatus.INTERNAL_SERVER_ERROR);
+        return response.createBuildResponseMessage("successfully unfollow " + user.getFirstName() + " " + user.getLastName(), HttpStatus.OK);
     }
 
     @Override
