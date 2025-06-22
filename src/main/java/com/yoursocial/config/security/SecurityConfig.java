@@ -47,15 +47,19 @@ public class SecurityConfig {
 
         http.csrf(AbstractHttpConfigurer::disable)
                 .authorizeHttpRequests(auth ->
-                        auth.requestMatchers("/api/v1/user/**","/api/v1/post/**").authenticated()
+                        auth.requestMatchers("/api/v1/user/**"
+                                        , "/api/v1/post/**",
+                                        "/api/v1/comment/**",
+                                        "/api/v1/reel/**",
+                                        "/api/v1/story/**"
+                                ).authenticated()
                                 .anyRequest().permitAll())
                 .httpBasic(Customizer.withDefaults())
                 .sessionManagement(httpSecuritySessionManagementConfigurer -> httpSecuritySessionManagementConfigurer.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .addFilterBefore(jwtFilter, UsernamePasswordAuthenticationFilter.class);
 
 
-
-       return http.build();
+        return http.build();
     }
 
 

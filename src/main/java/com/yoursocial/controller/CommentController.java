@@ -13,6 +13,7 @@ import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequiredArgsConstructor
@@ -73,12 +74,21 @@ public class CommentController implements CommentControllerEndpoint {
     @Override
     public ResponseEntity<?> likeComment(Integer commentId) {
 
-        boolean isCommentLike = commentService.likeComment(commentId);
-
-        if (isCommentLike) {
-            return response.createBuildResponseMessage("comment like successfully", HttpStatus.ACCEPTED);
+        Map<String, Object> response = commentService.likeComment(commentId);
+        if (response.get("status").equals("liked")) {
+            return ResponseEntity.ok()
+                    .body(Map.of(
+                            "message", "Comment liked successfully",
+                            "likeCount", response.get("likeCount")
+                    ));
+        } else {
+            return ResponseEntity.ok()
+                    .body(Map.of(
+                            "message", "Comment disliked successfully",
+                            "likeCount", response.get("likeCount")
+                    ));
         }
-
-        return response.createBuildResponseMessage("comment dislike successfully", HttpStatus.ACCEPTED);
     }
+
+
 }

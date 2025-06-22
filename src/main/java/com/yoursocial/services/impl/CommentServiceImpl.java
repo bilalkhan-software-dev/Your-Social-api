@@ -7,6 +7,7 @@ import com.yoursocial.dto.CommentResponse.PostResponse;
 import com.yoursocial.entity.Comment;
 import com.yoursocial.entity.Post;
 import com.yoursocial.entity.User;
+import com.yoursocial.exception.DuplicateLikeException;
 import com.yoursocial.exception.ResourceNotFoundException;
 import com.yoursocial.repository.CommentRepository;
 import com.yoursocial.repository.PostRepository;
@@ -15,11 +16,15 @@ import com.yoursocial.services.CommentService;
 import com.yoursocial.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
@@ -109,28 +114,47 @@ public class CommentServiceImpl implements CommentService {
     }
 
     @Override
-    public boolean likeComment(Integer commentId) {
-
+    public Map<String, Object> likeComment(Integer commentId) {
         User user = util.getLoggedInUserDetails();
+        Comment comment = commentRepository.findById(commentId)
+                .orElseThrow(() -> new ResourceNotFoundException("Comment not found with id: " + commentId));
 
-        Comment comment = commentRepository.findById(commentId).orElseThrow(
-                () -> new ResourceNotFoundException("comment not found")
-        );
-
-
-
-        boolean isCommentLike;
-        if (comment.getLiked().contains(user)){
-            comment.getLiked().remove(user);
-            isCommentLike = false;
-        }else {
-            comment.getLiked().add(user);
-            isCommentLike = true;
+        // Initialize a liked set if null
+        if (comment.getLiked() == null) {
+            comment.setLiked(new ArrayList<>());
         }
 
-        commentRepository.save(comment);
+        boolean isLiked;
+        List<User> likedUsers = comment.getLiked();
 
-        return isCommentLike;
+        // Check if user already liked the comment
+        boolean alreadyLiked = likedUsers.stream()
+                .anyMatch(u -> u.getId().equals(user.getId()));
+
+        if (alreadyLiked) {
+            // Unlike the comment
+            likedUsers.removeIf(u -> u.getId().equals(user.getId()));
+            isLiked = false;
+        } else {
+            // Like the comment
+            likedUsers.add(user);
+            isLiked = true;
+        }
+
+        try {
+            commentRepository.save(comment);
+        } catch (DataIntegrityViolationException e) {
+            throw new DuplicateLikeException("Failed to update like status - possible concurrent modification");
+        }
+
+        // Build response
+        Map<String, Object> response = new HashMap<>();
+        response.put("status", isLiked ? "liked" : "unliked");
+        response.put("likeCount", likedUsers.size());
+        response.put("commentId", commentId);
+        response.put("userId", user.getId());
+
+        return response;
     }
 
     private UserResponse getUserResponse(User user) {

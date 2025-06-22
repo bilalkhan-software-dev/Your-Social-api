@@ -19,4 +19,5 @@ public interface PostService {
 
     boolean likedPost(Integer postId);
 
+
 }

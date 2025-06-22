@@ -21,6 +21,7 @@ public class PostResponse {
     private String video;
 
     private Integer authorId;
+
     private String authorEmail;
 
     private List<Integer> likedByUserIds  = new ArrayList<>();

@@ -27,6 +27,7 @@ public class Comment {
     @ManyToOne
     private User user;
 
+    @ManyToMany
     private List<User> liked = new ArrayList<>();
 
     private LocalDateTime commentCreatedAt;

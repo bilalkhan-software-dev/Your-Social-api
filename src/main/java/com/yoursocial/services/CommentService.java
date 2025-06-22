@@ -4,6 +4,7 @@ import com.yoursocial.dto.CommentRequest;
 import com.yoursocial.dto.CommentResponse;
 
 import java.util.List;
+import java.util.Map;
 
 public interface CommentService {
 
@@ -15,6 +16,6 @@ public interface CommentService {
 
     List<CommentResponse> allComments();
 
-    boolean likeComment(Integer commentId);
+    Map<String,Object> likeComment(Integer commentId);
 
 }

@@ -1,6 +1,7 @@
 package com.yoursocial.handler;
 
 
+import com.yoursocial.exception.DuplicateLikeException;
 import com.yoursocial.exception.ExistDataException;
 import com.yoursocial.exception.JwtTokenExpiredException;
 import com.yoursocial.exception.ResourceNotFoundException;
@@ -27,13 +28,13 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(Exception.class)
     public ResponseEntity<?> handleException(Exception e) {
         log.error("Unhandled exception :{}", e.getMessage());
-        return util.createErrorResponseMessage("An unexpected error => "+ e.getMessage()+ " <= occurred.", HttpStatus.INTERNAL_SERVER_ERROR);
+        return util.createErrorResponseMessage("An unexpected error => " + e.getMessage() + " <= occurred.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(NullPointerException.class)
     public ResponseEntity<?> nullPointerException(NullPointerException e) {
         log.error("Null pointer exception: ", e);
-        return util.createErrorResponseMessage("Something went wrong => "+e.getMessage()+ " <= Please contact support.", HttpStatus.INTERNAL_SERVER_ERROR);
+        return util.createErrorResponseMessage("Something went wrong => " + e.getMessage() + " <= Please contact support.", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(MissingServletRequestParameterException.class)
@@ -46,6 +47,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> resourceNotFoundException(ResourceNotFoundException e) {
         log.error("Resource not found: {}", e.getMessage());
         return util.createErrorResponseMessage(e.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(DuplicateLikeException.class)
+    public ResponseEntity<?> resourceNotFoundException(DuplicateLikeException e) {
+        log.error("duplicate key exist: {}", e.getMessage());
+        return util.createErrorResponseMessage(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(AccessDeniedException.class)
@@ -71,6 +78,7 @@ public class GlobalExceptionHandler {
         log.error("Illegal argument: {}", e.getMessage());
         return util.createErrorResponseMessage(e.getMessage(), HttpStatus.BAD_REQUEST);
     }
+
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<?> badCredentialsException(BadCredentialsException e) {
         log.error("Bad credentials: {}", e.getMessage());
@@ -82,10 +90,6 @@ public class GlobalExceptionHandler {
         log.error("JWT token expired: {}", e.getMessage());
         return util.createErrorResponseMessage("Session expired. Please log in again.", HttpStatus.UNAUTHORIZED);
     }
-
-
-
-
 
 
 }
