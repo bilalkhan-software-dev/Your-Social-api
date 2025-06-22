@@ -24,7 +24,7 @@ public class ReelController implements ReelsControllerEndpoint {
     public ResponseEntity<?> createReel(ReelRequest request) {
 
         boolean isReelCreated = reelService.createReel(request);
-        if (!isReelCreated) {
+        if (isReelCreated) {
             return response.createBuildResponseMessage("reels added successfully!", HttpStatus.CREATED);
         }
 

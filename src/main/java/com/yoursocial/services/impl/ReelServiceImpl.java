@@ -87,7 +87,7 @@ public class ReelServiceImpl implements ReelService {
                         return new ResourceNotFoundException("reel not found");
                     }
                     // If it exists but doesn't belong to the user
-                    return new IllegalArgumentException("you can't delete another user's delete");
+                    return new IllegalArgumentException("you can't delete another user's reels");
                 });
 
         reelRepository.delete(isReelPresentAndUserAuthenticate);
