@@ -26,11 +26,17 @@ public class AuthServiceImpl implements AuthService {
     private final AuthenticationManager authenticationManager;
     private final JwtService jwtService;
 
+
+    @Override
+    public boolean checkUsernameAlreadyTakenOrNot(String email) {
+        return userRepository.existsByEmail(email);
+    }
+
     @Override
     public boolean registerUser(UserRequest user) {
 
 
-        boolean isExist = userRepository.existsByEmail(user.getEmail());
+        boolean isExist = checkUsernameAlreadyTakenOrNot(user.getEmail());
         if (isExist) {
             throw new ExistDataException("account already registered with username:" + user.getEmail() + ". Please try with another email!");
         }
