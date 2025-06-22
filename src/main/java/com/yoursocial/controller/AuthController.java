@@ -20,6 +20,17 @@ public class AuthController implements AuthControllerEndpoint {
     private final CommonUtil response;
 
     @Override
+    public ResponseEntity<?> checkUsernameTakenOrNot(String email) {
+
+        boolean isAlreadyTaken = authService.checkUsernameAlreadyTakenOrNot(email);
+        if (isAlreadyTaken) {
+            return response.createBuildResponseMessage("username already taken", HttpStatus.OK);
+        }
+
+        return response.createBuildResponseMessage("username is available", HttpStatus.OK);
+    }
+
+    @Override
     public ResponseEntity<?> registerUser(UserRequest userRequest) {
 
         boolean isRegistered = authService.registerUser(userRequest);

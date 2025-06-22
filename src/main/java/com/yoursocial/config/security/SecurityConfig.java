@@ -51,7 +51,9 @@ public class SecurityConfig {
                                         , "/api/v1/post/**",
                                         "/api/v1/comment/**",
                                         "/api/v1/reel/**",
-                                        "/api/v1/story/**"
+                                        "/api/v1/story/**",
+                                        "/api/v1/chat",
+                                        "/api/v1/message"
                                 ).authenticated()
                                 .anyRequest().permitAll())
                 .httpBasic(Customizer.withDefaults())
