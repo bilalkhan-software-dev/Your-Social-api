@@ -10,6 +10,9 @@ public interface UserControllerEndpoint {
     @DeleteMapping("/delete/{userId}") //  for admin
     public ResponseEntity<?> deleteUser(@PathVariable Integer userId);
 
+    @GetMapping("/profile")
+    public ResponseEntity<?> useProfile();
+
 
     @GetMapping("/all") // for admin
     public ResponseEntity<?> getAllUsers();

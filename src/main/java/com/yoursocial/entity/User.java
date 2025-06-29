@@ -1,6 +1,7 @@
 package com.yoursocial.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.*;
 import org.springframework.security.access.method.P;
@@ -31,6 +32,8 @@ public class User {
     @ElementCollection
     private List<Integer> following = new ArrayList<>();
 
+
+    @JsonIgnore
     @ManyToMany
     private List<Post> savedPost = new ArrayList<>();
 }

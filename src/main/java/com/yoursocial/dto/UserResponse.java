@@ -25,6 +25,7 @@ public class UserResponse {
     private List<Integer> followers = new ArrayList<>();
     private List<Integer> following = new ArrayList<>();
 
+
     private List<PostResponse> savedPost = new ArrayList<>();
 
 

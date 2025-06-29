@@ -9,10 +9,12 @@ import com.yoursocial.repository.UserRepository;
 import com.yoursocial.services.UserService;
 import com.yoursocial.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.Hibernate;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -20,6 +22,15 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepo;
     private final CommonUtil util;
+
+
+    @Override
+    public UserResponse showUserProfile() {
+
+        User user = util.getLoggedInUserDetails();
+
+        return getUserResponse(user);
+    }
 
     @Override
     public UserResponse findUserById(Integer userId) {
@@ -129,6 +140,29 @@ public class UserServiceImpl implements UserService {
 
 
     public static UserResponse getUserResponse(User user) {
+        // Initialize the savedPost collection first
+        Hibernate.initialize(user.getSavedPost());
+
+        List<PostResponse> savedPosts = user.getSavedPost().stream()
+                .map(post -> {
+                    // Initialize nested lazy collections for each post
+                    Hibernate.initialize(post.getLike());
+
+                    return PostResponse.builder()
+                            .postId(post.getId())
+                            .image(post.getImage())
+                            .video(post.getVideo())
+                            .caption(post.getCaption())
+                            .likedByUserIds(post.getLike().stream()
+                                    .map(User::getId)
+                                    .collect(Collectors.toList()))
+                            .createdAt(post.getCreatedAt())
+                            .authorId(post.getUser().getId())
+                            .authorEmail(post.getUser().getEmail())
+                            .build();
+                })
+                .collect(Collectors.toList());
+
         return UserResponse.builder()
                 .id(user.getId())
                 .gender(user.getGender())
@@ -137,16 +171,7 @@ public class UserServiceImpl implements UserService {
                 .lastName(user.getLastName())
                 .following(user.getFollowing())
                 .followers(user.getFollowers())
-                .savedPost(user.getSavedPost().stream().map(post -> PostResponse.builder()
-                        .postId(post.getId())
-                        .image(post.getImage())
-                        .video(post.getVideo())
-                        .caption(post.getCaption())
-                        .likedByUserIds(post.getLike().stream().map(User::getId).toList())
-                        .createdAt(post.getCreatedAt())
-                        .authorId(post.getUser().getId())
-                        .authorEmail(post.getUser().getEmail())
-                        .build()).toList())
+                .savedPost(savedPosts)
                 .build();
     }
 }

@@ -21,6 +21,18 @@ public class UserController implements UserControllerEndpoint {
     private final UserService userService;
     private final CommonUtil response;
 
+
+    @Override
+    public ResponseEntity<?> useProfile() {
+
+
+        UserResponse userResponse = userService.showUserProfile();
+        if (userResponse == null){
+            return response.createErrorResponseMessage("No user found maybe token invalid!",HttpStatus.UNAUTHORIZED);
+        }
+        return response.createBuildResponse(userResponse,HttpStatus.OK);
+    }
+
     @Override
     public ResponseEntity<?> deleteUser(Integer userId) {
 

@@ -14,8 +14,9 @@ public interface AuthControllerEndpoint {
     @PostMapping("/register")
     public ResponseEntity<?> registerUser(@RequestBody UserRequest userRequest);
 
-    @GetMapping("/login")
+    @PostMapping("/login")
     public ResponseEntity<?> login (@RequestBody LoginRequest user);
+
 
 
 }

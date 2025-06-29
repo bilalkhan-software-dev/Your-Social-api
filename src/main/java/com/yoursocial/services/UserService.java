@@ -11,6 +11,8 @@ import java.util.List;
 public interface UserService {
 
 
+    UserResponse showUserProfile();
+
     UserResponse findUserById(Integer userId);
 
     UserResponse findUserByEmail(String email);

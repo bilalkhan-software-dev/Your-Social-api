@@ -8,6 +8,7 @@ import com.yoursocial.repository.UserRepository;
 import com.yoursocial.services.AuthService;
 import com.yoursocial.services.JwtService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -18,6 +19,7 @@ import org.springframework.util.ObjectUtils;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class AuthServiceImpl implements AuthService {
 
     private final UserRepository userRepository;
@@ -38,17 +40,17 @@ public class AuthServiceImpl implements AuthService {
 
         boolean isExist = checkUsernameAlreadyTakenOrNot(user.getEmail());
         if (isExist) {
-            throw new ExistDataException("account already registered with username:" + user.getEmail() + ". Please try with another email!");
+            log.info("User already exist with username :{}", user.getEmail());
+            throw new ExistDataException("Account already registered with username: " + user.getEmail() + " .Please try with another email!");
         }
 
         User mappedUser = mapper.map(user, User.class);
 
         mappedUser.setPassword(passwordEncoder.encode(user.getPassword()));
         User saved = userRepository.save(mappedUser);
-
+        log.info("User registered  with username :{} and details :{}", user.getEmail(), user);
         return !ObjectUtils.isEmpty(saved);
     }
-
 
     @Override
     public LoginResponse login(LoginRequest user) {
@@ -58,10 +60,10 @@ public class AuthServiceImpl implements AuthService {
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
         if (authenticate.isAuthenticated()) {
+            log.info("User is authenticate with email: {} and password: {} and now generating token", username, passwordEncoder.encode(password));
             CustomUserDetails userDetails = (CustomUserDetails) authenticate.getPrincipal();
 
             String token = jwtService.generateToken(userDetails.getUser());
-
             User detailsUser = userDetails.getUser();
             return LoginResponse.builder()
                     .userDetails(UserServiceImpl.getUserResponse(detailsUser))
@@ -70,6 +72,4 @@ public class AuthServiceImpl implements AuthService {
         }
         return null;
     }
-
-
 }

@@ -1,16 +1,13 @@
 package com.yoursocial.dto;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @AllArgsConstructor
 @NoArgsConstructor
 @Builder
 @Getter
 @Setter
+@ToString
 public class UserRequest {
 
     private String firstName;
