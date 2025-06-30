@@ -8,7 +8,7 @@ import java.util.Map;
 
 public interface CommentService {
 
-    boolean createComment(CommentRequest commentRequest, Integer postId);
+    CommentResponse createComment(CommentRequest commentRequest, Integer postId);
 
     CommentResponse findCommentById(Integer commentId);
 

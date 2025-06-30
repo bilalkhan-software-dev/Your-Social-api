@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface MessageService {
 
-    boolean createdMessage(Integer chatId,MessageRequest messageRequest);
+    MessageResponse createdMessage(Integer chatId,MessageRequest messageRequest);
 
     List<MessageResponse> findChatMessage(Integer chatId);
 

@@ -9,11 +9,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
-import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
-
 
 @RestController
 @RequiredArgsConstructor
@@ -24,70 +22,73 @@ public class PostController implements PostControllerEndpoint {
 
     @Override
     public ResponseEntity<?> createPost(PostRequest postRequest) {
-
-
-        boolean isPostCreated = postService.createPost(postRequest);
-
-        if (isPostCreated) {
-            return response.createBuildResponseMessage("post created successfully!", HttpStatus.CREATED);
-        }
-
-        return response.createErrorResponseMessage("post creation failed", HttpStatus.INTERNAL_SERVER_ERROR);
+        PostResponse post = postService.createPost(postRequest);
+        return response.createBuildResponse(
+                "Post created successfully!",
+                post,
+                HttpStatus.CREATED
+        );
     }
 
     @Override
     public ResponseEntity<?> allPost() {
-
         List<PostResponse> allPost = postService.allPost();
 
         if (CollectionUtils.isEmpty(allPost)) {
             return ResponseEntity.noContent().build();
         }
 
-        return response.createBuildResponse(allPost, HttpStatus.OK);
+        return response.createBuildResponse(
+                "All posts retrieved successfully",
+                allPost,
+                HttpStatus.OK
+        );
     }
 
     @Override
     public ResponseEntity<?> findPostById(Integer postId) {
-
         PostResponse postDetails = postService.findPostById(postId);
-
-        if (!ObjectUtils.isEmpty(postDetails)) {
-            return response.createBuildResponse(postDetails, HttpStatus.OK);
-        }
-
-        return ResponseEntity.badRequest().build();
+        return response.createBuildResponse(
+                "Post details retrieved successfully",
+                postDetails,
+                HttpStatus.OK
+        );
     }
 
     @Override
     public ResponseEntity<?> deletePost(Integer postId) {
-
         postService.deletePost(postId);
-
-        return response.createBuildResponseMessage("post deleted successfully!", HttpStatus.OK);
+        return response.createBuildResponseMessage(
+                "Post deleted successfully!",
+                HttpStatus.OK
+        );
     }
 
     @Override
     public ResponseEntity<?> likePost(Integer postId) {
+        PostResponse postResponse = postService.likedPost(postId);
+        String message = postResponse.getIsLiked()
+                ? "Post liked successfully!"
+                : "Post unliked successfully!";
 
-        boolean isPostLiked = postService.likedPost(postId);
-
-        if (isPostLiked) {
-            return response.createBuildResponseMessage("post like successfully! if you like again then it will be removed from like post list", HttpStatus.ACCEPTED);
-        }
-
-        return response.createErrorResponseMessage("post dislike successfully!", HttpStatus.BAD_REQUEST);
+        return response.createBuildResponse(
+                message,
+                postResponse,
+                HttpStatus.OK
+        );
     }
 
     @Override
     public ResponseEntity<?> savePost(Integer postId) {
+        PostResponse postResponse = postService.savedPost(postId);
+        String message = postResponse.getIsSaved()
+                ? "Post saved successfully!"
+                : "Post unsaved successfully!";
 
-        boolean isPostSaved = postService.savedPost(postId);
-        if (isPostSaved) {
-            return response.createBuildResponseMessage("post saved successfully! if you saved again then it will be removed from save post list", HttpStatus.ACCEPTED);
-        }
-
-
-        return response.createBuildResponseMessage("post unsaved successfully!", HttpStatus.BAD_REQUEST);
+        return response.createBuildResponse(
+                message,
+                postResponse,
+                HttpStatus.OK
+        );
     }
 }

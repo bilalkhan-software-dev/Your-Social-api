@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -23,10 +24,10 @@ public class MessageController implements MessageControllerEndpoint {
     @Override
     public ResponseEntity<?> createMessage(Integer chatId, MessageRequest messageRequest) {
 
-        boolean isMessageCreated = messageService.createdMessage(chatId, messageRequest);
+        MessageResponse isMessageCreated = messageService.createdMessage(chatId, messageRequest);
 
-        if (isMessageCreated) {
-            return response.createBuildResponseMessage("Message successfully created!", HttpStatus.CREATED);
+        if (!ObjectUtils.isEmpty(isMessageCreated)) {
+            return response.createBuildResponse("Message successfully created!", isMessageCreated,HttpStatus.CREATED);
         }
 
         return response.createErrorResponseMessage("Message creation failed!", HttpStatus.INTERNAL_SERVER_ERROR);
@@ -43,6 +44,6 @@ public class MessageController implements MessageControllerEndpoint {
             return ResponseEntity.noContent().build();
         }
 
-        return response.createBuildResponse(chatMessages, HttpStatus.OK);
+        return response.createBuildResponse("Messages  retrieved successfully!",chatMessages, HttpStatus.OK);
     }
 }

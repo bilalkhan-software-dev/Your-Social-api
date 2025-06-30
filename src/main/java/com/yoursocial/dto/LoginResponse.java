@@ -8,7 +8,8 @@ import lombok.Data;
 @Builder
 public class LoginResponse {
 
-    private UserResponse userDetails;
+    private String email ;
+    private String fullName;
     private String token;
 
 }

@@ -15,4 +15,14 @@ public interface MessageRepository extends JpaRepository<Message, Integer> {
 
     List<Message> findByChatId(Integer chatId);
 
+    List<Message> findByChatIdOrderByMessageCreatedAtAsc(Integer chatId);
+
+    /*
+     *     findBy: Indicates a query operation
+     *     ChatId: Filters messages by the chat ID
+     *     OrderByMessageCreatedAtAsc: Sorts the results by the messageCreatedAt field in ascending order (older first)
+     *     For descending order (newest first), you would use OrderByMessageCreatedAtDesc
+     */
+
+
 }

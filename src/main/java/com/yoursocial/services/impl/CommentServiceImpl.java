@@ -11,7 +11,6 @@ import com.yoursocial.exception.DuplicateLikeException;
 import com.yoursocial.exception.ResourceNotFoundException;
 import com.yoursocial.repository.CommentRepository;
 import com.yoursocial.repository.PostRepository;
-import com.yoursocial.repository.UserRepository;
 import com.yoursocial.services.CommentService;
 import com.yoursocial.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
@@ -38,7 +37,7 @@ public class CommentServiceImpl implements CommentService {
 
 
     @Override
-    public boolean createComment(CommentRequest commentRequest, Integer postId) {
+    public CommentResponse createComment(CommentRequest commentRequest, Integer postId) {
 
         User isUserLoggedIn = util.getLoggedInUserDetails();
 
@@ -57,8 +56,21 @@ public class CommentServiceImpl implements CommentService {
         post.getComments().add(comment);
         Post isCommentSavedInPost = postRepository.save(post);
 
+        CommentResponse commentResponse = null;
 
-        return (!ObjectUtils.isEmpty(isCommentCreated) && !ObjectUtils.isEmpty(isCommentSavedInPost));
+        if ((!ObjectUtils.isEmpty(isCommentCreated) && !ObjectUtils.isEmpty(isCommentSavedInPost))){
+
+            commentResponse = CommentResponse.
+                    builder()
+                    .id(isCommentCreated.getId())
+                    .content(isCommentCreated.getContent())
+                    .commentCreatedAt(isCommentCreated.getCommentCreatedAt())
+                    .totalLikesOnComment(isCommentCreated.getLiked().size())
+                    .commentLikedByUsers(isCommentCreated.getLiked().stream().map(this::getUserResponse).toList())
+                    .user(getUserResponse(isCommentCreated.getUser()))
+                    .build();
+        }
+        return commentResponse;
     }
 
     @Override
@@ -74,6 +86,7 @@ public class CommentServiceImpl implements CommentService {
                 .id(isCommentPresent.getId())
                 .content(isCommentPresent.getContent())
                 .commentCreatedAt(isCommentPresent.getCommentCreatedAt())
+                .totalLikesOnComment(isCommentPresent.getLiked().size())
                 .commentLikedByUsers(isCommentPresent.getLiked().stream().map(this::getUserResponse).toList())
                 .user(getUserResponse(isCommentPresent.getUser()))
                 .build();
@@ -94,6 +107,7 @@ public class CommentServiceImpl implements CommentService {
                 .content(comment.getContent())
                 .commentCreatedAt(comment.getCommentCreatedAt())
                 .commentLikedByUsers(comment.getLiked().stream().map(this::getUserResponse).toList())
+                .totalLikesOnComment(comment.getLiked().size())
                 .user(getUserResponse(comment.getUser()))
                 .build()).toList();
     }
@@ -109,6 +123,7 @@ public class CommentServiceImpl implements CommentService {
                 .content(comment.getContent())
                 .commentCreatedAt(comment.getCommentCreatedAt())
                 .commentLikedByUsers(comment.getLiked().stream().map(this::getUserResponse).toList())
+                .totalLikesOnComment(comment.getLiked().size())
                 .user(getUserResponse(comment.getUser()))
                 .build()).toList();
     }

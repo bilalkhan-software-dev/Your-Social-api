@@ -33,7 +33,6 @@ public class User {
     private List<Integer> following = new ArrayList<>();
 
 
-    @JsonIgnore
     @ManyToMany
     private List<Post> savedPost = new ArrayList<>();
 }

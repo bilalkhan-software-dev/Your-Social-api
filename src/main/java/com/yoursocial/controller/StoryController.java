@@ -27,10 +27,10 @@ public class StoryController implements StoryControllerEndpoint {
         boolean isStoryAdded = storyService.createStory(storyRequest);
 
         if (isStoryAdded) {
-            return response.createBuildResponseMessage("story added successfully!", HttpStatus.CREATED);
+            return response.createBuildResponseMessage("Story added successfully!", HttpStatus.CREATED);
         }
 
-        return response.createErrorResponseMessage("story added failed!", HttpStatus.INTERNAL_SERVER_ERROR);
+        return response.createErrorResponseMessage("Story added failed!", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
@@ -41,7 +41,7 @@ public class StoryController implements StoryControllerEndpoint {
             return ResponseEntity.noContent().build();
         }
 
-        return response.createBuildResponse(userAddedStory, HttpStatus.OK);
+        return response.createBuildResponse("Get all user story retrieved successfully!",userAddedStory, HttpStatus.OK);
     }
 
     @Override
@@ -49,6 +49,6 @@ public class StoryController implements StoryControllerEndpoint {
 
         storyService.deleteStory(storyId);
 
-        return response.createErrorResponseMessage("story deleted successfully!", HttpStatus.OK);
+        return response.createErrorResponseMessage("Story deleted successfully!", HttpStatus.OK);
     }
 }

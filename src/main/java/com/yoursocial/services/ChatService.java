@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ChatService {
 
-    boolean createChat(ChatRequest chatRequest);
+    ChatResponse createChat(ChatRequest chatRequest);
 
     ChatResponse findChatById(Integer chatId);
 

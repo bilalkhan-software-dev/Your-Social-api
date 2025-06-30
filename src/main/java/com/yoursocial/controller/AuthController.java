@@ -52,10 +52,10 @@ public class AuthController implements AuthControllerEndpoint {
         LoginResponse loginResponse = authService.login(user);
 
         if (!ObjectUtils.isEmpty(loginResponse)) {
-            return response.createBuildResponse(loginResponse, HttpStatus.OK);
+            return response.createBuildResponse("User login Successfully!",loginResponse, HttpStatus.OK);
         }
 
-        return response.createErrorResponseMessage("invalid credentials", HttpStatus.UNAUTHORIZED);
+        return response.createErrorResponseMessage("Invalid credentials", HttpStatus.UNAUTHORIZED);
     }
 
 

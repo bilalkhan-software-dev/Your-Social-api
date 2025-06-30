@@ -22,44 +22,54 @@ public class ChatController implements ChatControllerEndpoint {
 
     @Override
     public ResponseEntity<?> createChat(ChatRequest chatRequest) {
+        ChatResponse chatResponse = chatService.createChat(chatRequest);
 
-        boolean isChatCreated = chatService.createChat(chatRequest);
-        if (isChatCreated) {
-            return response.createBuildResponseMessage("Chat created successfully!", HttpStatus.CREATED);
+        if (chatResponse.isChatAlreadyCreated()) {
+            return response.createBuildResponse(
+                    "Chat already exists between these users",
+                    chatResponse,
+                    HttpStatus.OK
+            );
         }
 
-        return response.createBuildResponseMessage("Chat already created!", HttpStatus.OK);
+        return response.createBuildResponse(
+                "Chat created successfully!",
+                chatResponse,
+                HttpStatus.CREATED
+        );
     }
 
     @Override
     public ResponseEntity<?> allChatsOfTheLoggedInCreatedUser() {
+        List<ChatResponse> chats = chatService.getAllCreatedChatsOfTheUser();
 
-        List<ChatResponse> allCreatedChatsOfTheUser = chatService.getAllCreatedChatsOfTheUser();
-
-        if (CollectionUtils.isEmpty(allCreatedChatsOfTheUser)) {
+        if (CollectionUtils.isEmpty(chats)) {
             return ResponseEntity.noContent().build();
         }
 
-        return response.createBuildResponse(allCreatedChatsOfTheUser, HttpStatus.OK);
+        return response.createBuildResponse(
+                "All chats retrieved successfully",
+                chats,
+                HttpStatus.OK
+        );
     }
 
     @Override
     public ResponseEntity<?> chatDetailsByID(Integer chatId) {
-
         ChatResponse chatDetail = chatService.findChatById(chatId);
-
-        if (chatDetail != null) {
-            return response.createBuildResponse(chatDetail, HttpStatus.OK);
-        }
-
-        return response.createErrorResponseMessage("Something went wrong on server. Chat is empty", HttpStatus.INTERNAL_SERVER_ERROR);
+        return response.createBuildResponse(
+                "Chat details retrieved successfully",
+                chatDetail,
+                HttpStatus.OK
+        );
     }
 
     @Override
     public ResponseEntity<?> deleteChatOfTheUser(Integer chatId) {
-
         chatService.deleteChatOfTheAuthenticateUser(chatId);
-
-        return response.createBuildResponseMessage("Chat deleted successfully!", HttpStatus.OK);
+        return response.createBuildResponseMessage(
+                "Chat deleted successfully!",
+                HttpStatus.OK
+        );
     }
 }

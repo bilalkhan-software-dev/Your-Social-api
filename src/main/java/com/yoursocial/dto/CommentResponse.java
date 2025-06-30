@@ -24,6 +24,7 @@ public class CommentResponse {
     private LocalDateTime commentCreatedAt;
 
 
+    private Integer totalLikesOnComment;
     private List<UserResponse> commentLikedByUsers = new ArrayList<>();
 
 

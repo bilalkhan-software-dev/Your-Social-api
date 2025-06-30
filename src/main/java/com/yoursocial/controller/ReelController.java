@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.CollectionUtils;
+import org.springframework.util.ObjectUtils;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
@@ -23,12 +24,12 @@ public class ReelController implements ReelsControllerEndpoint {
     @Override
     public ResponseEntity<?> createReel(ReelRequest request) {
 
-        boolean isReelCreated = reelService.createReel(request);
-        if (isReelCreated) {
-            return response.createBuildResponseMessage("reels added successfully!", HttpStatus.CREATED);
+        ReelResponse reel = reelService.createReel(request);
+        if (!ObjectUtils.isEmpty(reel)) {
+            return response.createBuildResponse("Reels added successfully!", reel, HttpStatus.CREATED);
         }
 
-        return response.createErrorResponseMessage("reels added failed!", HttpStatus.INTERNAL_SERVER_ERROR);
+        return response.createErrorResponseMessage("Reels added failed!", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @Override
@@ -37,9 +38,8 @@ public class ReelController implements ReelsControllerEndpoint {
         List<ReelResponse> allCreatedReel = reelService.allCreatedReel();
 
         if (!CollectionUtils.isEmpty(allCreatedReel)) {
-            return response.createBuildResponse(allCreatedReel, HttpStatus.OK);
+            return response.createBuildResponse("All reel retrieved successfully!", allCreatedReel, HttpStatus.OK);
         }
-
         return ResponseEntity.noContent().build();
     }
 
@@ -49,7 +49,7 @@ public class ReelController implements ReelsControllerEndpoint {
         List<ReelResponse> reelsOfTheLoggedInUser = reelService.getReelOfTheLoggedInUser();
 
         if (!CollectionUtils.isEmpty(reelsOfTheLoggedInUser)) {
-            return response.createBuildResponse(reelsOfTheLoggedInUser, HttpStatus.OK);
+            return response.createBuildResponse("Get all reel of the user retrieved successfully!", reelsOfTheLoggedInUser, HttpStatus.OK);
         }
         return ResponseEntity.noContent().build();
     }
@@ -59,6 +59,6 @@ public class ReelController implements ReelsControllerEndpoint {
 
         reelService.deleteReelOfTheUser(reelId);
 
-        return response.createBuildResponseMessage("reel deleted successfully!", HttpStatus.OK);
+        return response.createBuildResponseMessage("Reels deleted successfully!", HttpStatus.OK);
     }
 }
