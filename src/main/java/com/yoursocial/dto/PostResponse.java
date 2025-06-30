@@ -1,12 +1,9 @@
 package com.yoursocial.dto;
 
-
 import lombok.*;
-
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
-
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -14,33 +11,34 @@ import java.util.List;
 @Getter
 @Setter
 public class PostResponse {
-
     private Integer postId;
     private String caption;
     private String image;
     private String video;
-
     private Integer authorId;
-
     private String authorEmail;
-
-    private List<Integer> likedByUserIds  = new ArrayList<>();
+    private Boolean isLiked;
+    private Boolean isSaved;
+    private Integer postLikesCount;
+    private Integer commentsCount;
+    private Integer savesCount;
+    @Builder.Default
+    private List<Integer> likedByUserIds = new ArrayList<>();
+    @Builder.Default
     private List<CommentResponse> comments = new ArrayList<>();
     private LocalDateTime createdAt;
 
-
     @AllArgsConstructor
     @NoArgsConstructor
     @Builder
     @Getter
     @Setter
-    public static class CommentResponse{
-
+    public static class CommentResponse {
         private Integer commentId;
         private String content;
-        private CommentUserDetails user;
+        private CommentUserDetails commentUserDetails;
+        @Builder.Default
         private List<Integer> commentLikes = new ArrayList<>();
-
     }
 
     @AllArgsConstructor
@@ -48,15 +46,9 @@ public class PostResponse {
     @Builder
     @Getter
     @Setter
-    public static class CommentUserDetails{
+    public static class CommentUserDetails {
         private Integer id;
         private String firstName;
         private String email;
-
-
     }
-
-
-
 }
-

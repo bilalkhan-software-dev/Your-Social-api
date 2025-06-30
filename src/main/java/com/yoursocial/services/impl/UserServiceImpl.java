@@ -52,7 +52,7 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    public boolean updateUser(UpdateUserRequest userRequest) {
+    public UserResponse updateUser(UpdateUserRequest userRequest) {
 
         Integer userId = util.getLoggedInUserDetails().getId();
         User existingUser = userRepo.findById(userId).orElseThrow(
@@ -71,8 +71,12 @@ public class UserServiceImpl implements UserService {
         }
 
         User isUpdated = userRepo.save(existingUser);
+        UserResponse userResponse = null;
 
-        return !ObjectUtils.isEmpty(isUpdated);
+        if (!ObjectUtils.isEmpty(isUpdated)){
+            userResponse = getUserResponse(isUpdated);
+        }
+        return userResponse;
     }
 
     @Override
@@ -102,13 +106,13 @@ public class UserServiceImpl implements UserService {
         Integer loggedInUserId = util.getLoggedInUserDetails().getId();
 
         if (loggedInUserId.equals(userId)) {
-            throw new IllegalArgumentException("you can't follow/unfollow yourself");
+            throw new IllegalArgumentException("You can't follow/unfollow yourself");
         }
 
         User follower = userRepo.findById(loggedInUserId)
-                .orElseThrow(() -> new ResourceNotFoundException("user not found with id: " + loggedInUserId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + loggedInUserId));
         User followee = userRepo.findById(userId)
-                .orElseThrow(() -> new ResourceNotFoundException("user not found with id: " + userId));
+                .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
         boolean isFollowing = follower.getFollowing().contains(userId);
 
@@ -122,7 +126,6 @@ public class UserServiceImpl implements UserService {
 
         userRepo.save(follower);
         userRepo.save(followee);
-
         // Returns true if now following, false if now unfollowed
         return !isFollowing;
     }

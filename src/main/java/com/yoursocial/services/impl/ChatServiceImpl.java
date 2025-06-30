@@ -30,23 +30,22 @@ public class ChatServiceImpl implements ChatService {
     private final ChatRepository chatRepository;
     private final CommonUtil util;
     private final UserRepository userRepository;
-
+    private final ModelMapper modelMapper;
 
     @Override
-    public boolean createChat(ChatRequest chatRequest) {
-
+    public ChatResponse createChat(ChatRequest chatRequest) {
         User loggedInUser = util.getLoggedInUserDetails();
-
         Integer createdChatWithId = chatRequest.getCreatedChatWithId();
 
-        try {
         User reqUser = userRepository.findById(createdChatWithId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with ID: " + createdChatWithId));
 
-        Chat isChatExistBetweenUsers = chatRepository.findChatBetweenUsers(loggedInUser, reqUser);
-
-        if (isChatExistBetweenUsers != null) {
-            return false;
+        // Check if chat already exists between these users
+        Chat existingChat = chatRepository.findChatBetweenUsers(loggedInUser, reqUser);
+        if (existingChat != null) {
+            return getChatResponse(existingChat)
+                    .withIsChatAlreadyCreated(true)
+                    .withIsChatCreated(false);
         }
 
         // Create new chat
@@ -56,48 +55,37 @@ public class ChatServiceImpl implements ChatService {
         chat.setChatCreatedAt(LocalDateTime.now());
         chat.setUsers(List.of(loggedInUser, reqUser));
 
-        chatRepository.save(chat);
-        return true;
-        }catch (ObjectOptimisticLockingFailureException ex) {
-            throw new ConcurrentModificationException("Chat creation failed due to concurrent modification. Please try again.");
-        }
+        Chat savedChat = chatRepository.save(chat);
+        return getChatResponse(savedChat)
+                .withIsChatCreated(true)
+                .withIsChatAlreadyCreated(false);
     }
 
     @Override
     public ChatResponse findChatById(Integer chatId) {
-
         Chat chat = chatRepository.findById(chatId)
                 .orElseThrow(() -> new ResourceNotFoundException("Chat not found with ID: " + chatId));
-
         return getChatResponse(chat);
     }
 
     @Override
     public List<ChatResponse> getAllCreatedChatsOfTheUser() {
-
-        Integer loggedInUser = util.getLoggedInUserDetails().getId();
-
-        List<Chat> chats = chatRepository.findByUsersId(loggedInUser);
-
+        Integer loggedInUserId = util.getLoggedInUserDetails().getId();
+        List<Chat> chats = chatRepository.findByUsersId(loggedInUserId);
         return chats.stream().map(this::getChatResponse).toList();
     }
 
     @Override
     public void deleteChatOfTheAuthenticateUser(Integer chatId) {
-
-        Integer loggedInUser = util.getLoggedInUserDetails().getId();
-
-        Chat chat = chatRepository.findByIdAndUsersId(chatId, loggedInUser).orElseThrow(
-                () -> {
-                    // First check if the chat exists by id
+        Integer loggedInUserId = util.getLoggedInUserDetails().getId();
+        Chat chat = chatRepository.findByIdAndUsersId(chatId, loggedInUserId)
+                .orElseThrow(() -> {
                     if (!chatRepository.existsById(chatId)) {
                         return new ResourceNotFoundException("Chat not found with id: " + chatId);
                     }
-                    // If it exists but doesn't belong to the user
-                    return new IllegalArgumentException("You can't delete another user chat");
+                    return new IllegalArgumentException("You can't delete another user's chat");
                 });
         chatRepository.delete(chat);
-
     }
 
     private ChatResponse getChatResponse(Chat chat) {
@@ -106,11 +94,15 @@ public class ChatServiceImpl implements ChatService {
                 .chatName(chat.getChatName())
                 .chatImage(chat.getChatImage())
                 .chatCreatAt(chat.getChatCreatedAt())
-                .users(chat.getUsers().stream().map(user -> UserResponse.builder()
-                        .userId(user.getId())
-                        .fullName(user.getFirstName() + " " + user.getLastName())
-                        .email(user.getEmail())
-                        .build()).toList())
+                .isChatCreated(true)
+                .isChatAlreadyCreated(false)
+                .users(chat.getUsers().stream()
+                        .map(user -> UserResponse.builder()
+                                .userId(user.getId())
+                                .fullName(user.getFirstName() + " " + user.getLastName())
+                                .email(user.getEmail())
+                                .build())
+                        .toList())
                 .build();
     }
 }

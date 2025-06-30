@@ -31,64 +31,55 @@ public class MessageServiceImpl implements MessageService {
     private final CommonUtil util;
 
     @Override
-    public boolean createdMessage(Integer chatId, MessageRequest messageRequest) {
-
+    public MessageResponse createdMessage(Integer chatId, MessageRequest messageRequest) {
         User loggedInUser = util.getLoggedInUserDetails();
+        Chat chat = chatRepository.findById(chatId)
+                .orElseThrow(() -> new ResourceNotFoundException("Chat not found with id: " + chatId));
+
+        // Verify user is part of the chat
+        if (!chat.getUsers().contains(loggedInUser)) {
+            throw new IllegalArgumentException("User is not part of this chat");
+        }
 
         Message message = mapper.map(messageRequest, Message.class);
-
-        Chat chat = chatRepository.findById(chatId).
-                orElseThrow(
-                        () -> new ResourceNotFoundException("Chat not found with id: " + chatId)
-                );
-
-
         message.setMessageCreatedAt(LocalDateTime.now());
         message.setUser(loggedInUser);
         message.setChat(chat);
 
-        Message isMessageCreated = messageRepository.save(message);
-
-        return !ObjectUtils.isEmpty(isMessageCreated);
+        Message savedMessage = messageRepository.save(message);
+        return getMessageResponse(savedMessage);
     }
 
     @Override
     public List<MessageResponse> findChatMessage(Integer chatId) {
+        // Verify chat exists
+        if (!chatRepository.existsById(chatId)) {
+            throw new ResourceNotFoundException("Chat not found with id: " + chatId);
+        }
 
-        chatRepository.findById(chatId).orElseThrow(
-                () -> new ResourceNotFoundException("Chat not found with id: "+ chatId)
-        );
-
-        List<Message> chats = messageRepository.findByChatId(chatId);
-
-        return chats.stream().map(this::getMessageResponse)
+        List<Message> messages = messageRepository.findByChatIdOrderByMessageCreatedAtAsc(chatId);
+        return messages.stream()
+                .map(this::getMessageResponse)
                 .toList();
     }
-
 
     private MessageResponse getMessageResponse(Message message) {
         return MessageResponse.builder()
                 .messageId(message.getId())
-                .image(message.getImage())
                 .content(message.getContent())
+                .image(message.getImage())
                 .messageCreatedAt(message.getMessageCreatedAt())
                 .messageUserDetails(MessageUserDetails.builder()
-                        .email(message.getUser().getEmail())
                         .userId(message.getUser().getId())
                         .fullName(message.getUser().getFirstName() + " " + message.getUser().getLastName())
+                        .email(message.getUser().getEmail())
                         .build())
                 .chatDetails(ChatResponse.builder()
                         .id(message.getChat().getId())
                         .chatName(message.getChat().getChatName())
                         .chatImage(message.getChat().getChatImage())
                         .chatCreatAt(message.getChat().getChatCreatedAt())
-                        .users(message.getChat().getUsers().stream().map(user -> ChatResponse.UserResponse.builder()
-                                .userId(user.getId())
-                                .fullName(user.getFirstName() + " " + user.getLastName())
-                                .email(user.getEmail())
-                                .build()).toList())
                         .build())
                 .build();
     }
-
 }

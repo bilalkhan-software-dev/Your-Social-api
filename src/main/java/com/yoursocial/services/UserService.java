@@ -17,7 +17,7 @@ public interface UserService {
 
     UserResponse findUserByEmail(String email);
 
-    boolean updateUser(UpdateUserRequest userRequest);
+    UserResponse updateUser(UpdateUserRequest userRequest);
 
     List<UserResponse> searchUser(String query);
 

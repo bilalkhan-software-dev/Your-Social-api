@@ -27,7 +27,7 @@ public class ReelServiceImpl implements ReelService {
     private final ModelMapper mapper;
 
     @Override
-    public boolean createReel(ReelRequest request) {
+    public ReelResponse createReel(ReelRequest request) {
 
         User loggedInUser = util.getLoggedInUserDetails();
 
@@ -37,7 +37,18 @@ public class ReelServiceImpl implements ReelService {
 
         Reel isReelSaved = reelRepository.save(reel);
 
-        return !ObjectUtils.isEmpty(isReelSaved);
+        ReelResponse response = null;
+        if (!ObjectUtils.isEmpty(isReelSaved)){
+            response = ReelResponse.builder()
+                    .createdAt(isReelSaved.getCreatedAt())
+                    .title(isReelSaved.getTitle())
+                    .video(isReelSaved.getVideo())
+                    .id(isReelSaved.getId())
+                    .userInfo(getUserInfo(isReelSaved.getUser()))
+                    .build();
+        }
+
+        return response;
     }
 
     @Override
@@ -84,10 +95,10 @@ public class ReelServiceImpl implements ReelService {
                 .orElseThrow(() -> {
                     // First check if the story exists at all
                     if (!reelRepository.existsById(reelId)) {
-                        return new ResourceNotFoundException("reel not found");
+                        return new ResourceNotFoundException("Reel not found");
                     }
                     // If it exists but doesn't belong to the user
-                    return new IllegalArgumentException("you can't delete another user's reels");
+                    return new IllegalArgumentException("You can't delete another user's reels");
                 });
 
         reelRepository.delete(isReelPresentAndUserAuthenticate);

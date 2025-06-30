@@ -28,7 +28,10 @@ public class ReelResponse {
         private String authorEmail;
         private String fullName;
 
+        @Builder.Default
         private List<Integer> followers = new ArrayList<>();
+
+        @Builder.Default
         private List<Integer> following = new ArrayList<>();
     }
 

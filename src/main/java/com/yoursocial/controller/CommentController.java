@@ -25,14 +25,14 @@ public class CommentController implements CommentControllerEndpoint {
     @Override
     public ResponseEntity<?> createPost(CommentRequest commentRequest, Integer postId) {
 
-        boolean isCommentAdded = commentService.createComment(commentRequest, postId);
+        CommentResponse comment = commentService.createComment(commentRequest, postId);
 
-        if (isCommentAdded) {
-            return response.createBuildResponseMessage("comment added successfully in post id:" + postId, HttpStatus.CREATED);
+
+        if (!ObjectUtils.isEmpty(comment)) {
+            return response.createBuildResponse("Comment added successfully in post id:" + postId, comment,HttpStatus.CREATED);
         }
 
-        return response.createErrorResponseMessage("comment not added", HttpStatus.BAD_REQUEST);
-
+        return response.createErrorResponseMessage("Comment not added", HttpStatus.BAD_REQUEST);
     }
 
     @Override
@@ -44,7 +44,7 @@ public class CommentController implements CommentControllerEndpoint {
             return ResponseEntity.noContent().build();
         }
 
-        return response.createBuildResponse(allCommentsOfThePost, HttpStatus.OK);
+        return response.createBuildResponse("Retrieved all comment on the post",allCommentsOfThePost, HttpStatus.OK);
     }
 
     @Override
@@ -55,7 +55,7 @@ public class CommentController implements CommentControllerEndpoint {
         if (CollectionUtils.isEmpty(allComment)) {
             return ResponseEntity.noContent().build();
         }
-        return response.createBuildResponse(allComment, HttpStatus.OK);
+        return response.createBuildResponse("Retrieved all comments => for Admin",allComment, HttpStatus.OK);
     }
 
 
@@ -65,10 +65,10 @@ public class CommentController implements CommentControllerEndpoint {
         CommentResponse commentDetails = commentService.findCommentById(commentId);
 
         if (ObjectUtils.isEmpty(commentDetails)) {
-            return response.createErrorResponseMessage("comment is empty", HttpStatus.BAD_REQUEST);
+            return response.createErrorResponseMessage("Comment is empty", HttpStatus.BAD_REQUEST);
         }
 
-        return response.createBuildResponse(commentDetails, HttpStatus.OK);
+        return response.createBuildResponse("Retrieved comment details",commentDetails, HttpStatus.OK);
     }
 
     @Override

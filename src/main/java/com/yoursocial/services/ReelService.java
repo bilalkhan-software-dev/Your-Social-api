@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface ReelService {
 
-    boolean createReel(ReelRequest request);
+    ReelResponse createReel(ReelRequest request);
 
     List<ReelResponse> allCreatedReel();
 

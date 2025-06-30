@@ -7,7 +7,7 @@ import java.util.List;
 
 public interface PostService {
 
-    boolean createPost(PostRequest postRequest);
+    PostResponse createPost(PostRequest postRequest);
 
     void deletePost(Integer postId);
 
@@ -15,9 +15,9 @@ public interface PostService {
 
     List<PostResponse> allPost();
 
-    boolean savedPost(Integer postId);
+    PostResponse savedPost(Integer postId);
 
-    boolean likedPost(Integer postId);
+    PostResponse likedPost(Integer postId);
 
 
 }

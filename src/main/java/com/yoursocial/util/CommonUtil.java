@@ -11,12 +11,12 @@ import org.springframework.stereotype.Component;
 @Component
 public class CommonUtil {
 
-    public ResponseEntity<?> createBuildResponse(Object data, HttpStatus httpStatusCode) {
+    public ResponseEntity<?> createBuildResponse(String message,Object data, HttpStatus httpStatusCode) {
 
         GenericResponse response = GenericResponse.builder()
                 .responseStatusCode(httpStatusCode)
                 .status("success")
-                .message("fetching data")
+                .message(message)
                 .data(data)
                 .build();
 
@@ -32,11 +32,11 @@ public class CommonUtil {
         return response.create();
     }
 
-    public ResponseEntity<?> createErrorResponse(Object data, HttpStatus httpStatusCode) {
+    public ResponseEntity<?> createErrorResponse(String message,Object data, HttpStatus httpStatusCode) {
         GenericResponse response = GenericResponse.builder()
                 .responseStatusCode(httpStatusCode)
                 .status("failed!")
-                .message("something went wrong!")
+                .message(message)
                 .data(data)
                 .build();
         return response.create();
