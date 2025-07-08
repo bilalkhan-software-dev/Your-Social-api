@@ -1,6 +1,7 @@
 package com.yoursocial.repository;
 
 import com.yoursocial.entity.User;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -11,10 +12,14 @@ import java.util.Optional;
 
 
 @Repository
-public interface UserRepository extends JpaRepository<User,Integer> {
+public interface UserRepository extends JpaRepository<User, Integer> {
+
+    @EntityGraph(attributePaths = {
+            "savedPost"
+    })
+    Optional<User> findWithSavedPostsById(Integer id);
 
     Optional<User> findByEmail(String email);
-
 
     @Query("select u from User u where lower(u.firstName) like lower(concat('%',:query,'%'))" +
             " or lower(u.lastName) like lower(concat('%',:query,'%'))" +

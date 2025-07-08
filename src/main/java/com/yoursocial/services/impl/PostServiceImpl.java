@@ -73,6 +73,15 @@ public class PostServiceImpl implements PostService {
                 .toList();
     }
 
+    @Override
+    public List<PostResponse> getAllUserPost() {
+
+        User loggedInUser = util.getLoggedInUserDetails();
+
+        List<Post> loggedInUserPosts = postRepository.findByUser(loggedInUser);
+        return loggedInUserPosts.stream().map(this::getPostResponse).toList();
+    }
+
     public PostResponse likedPost(Integer postId) {
         User user = util.getLoggedInUserDetails();
         Post post = postRepository.findById(postId)
@@ -138,6 +147,9 @@ public class PostServiceImpl implements PostService {
                 .video(post.getVideo())
                 .authorId(author.getId())
                 .authorEmail(author.getEmail())
+                .authorFirstName(author.getFirstName())
+                .authorLastName(author.getLastName())
+                .authorProfilePic(author.getImage())
                 .postLikesCount(post.getLike().size())
                 .commentsCount(post.getComments().size())
                 .savesCount(author.getSavedPost().size())

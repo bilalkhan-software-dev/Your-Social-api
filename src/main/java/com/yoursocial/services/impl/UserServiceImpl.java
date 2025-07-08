@@ -25,7 +25,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public UserResponse showUserProfile() {
 
-        User user = util.getLoggedInUserDetails();
+        Integer id = util.getLoggedInUserDetails().getId();
+
+        User user = userRepo.findWithSavedPostsById(id).orElseThrow(
+                () -> new ResourceNotFoundException("User not found!")
+        );
 
         return getUserResponse(user);
     }
@@ -70,10 +74,22 @@ public class UserServiceImpl implements UserService {
             existingUser.setGender(userRequest.getGender());
         }
 
+        if (userRequest.getBio() != null) {
+            existingUser.setBio(userRequest.getBio());
+        }
+
+        if (userRequest.getBanner() != null) {
+            existingUser.setBanner(userRequest.getBanner());
+        }
+
+        if (userRequest.getImage() != null) {
+            existingUser.setImage(userRequest.getImage());
+        }
+
         User isUpdated = userRepo.save(existingUser);
         UserResponse userResponse = null;
 
-        if (!ObjectUtils.isEmpty(isUpdated)){
+        if (!ObjectUtils.isEmpty(isUpdated)) {
             userResponse = getUserResponse(isUpdated);
         }
         return userResponse;
@@ -147,6 +163,9 @@ public class UserServiceImpl implements UserService {
                 .email(user.getEmail())
                 .firstName(user.getFirstName())
                 .lastName(user.getLastName())
+                .bio(user.getBio())
+                .image(user.getImage())
+                .banner(user.getBanner())
                 .following(user.getFollowing())
                 .followers(user.getFollowers())
                 .savedPost(user.getSavedPost().stream().map(post -> PostResponse.builder()

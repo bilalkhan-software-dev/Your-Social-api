@@ -55,7 +55,7 @@ public class AuthController implements AuthControllerEndpoint {
             return response.createBuildResponse("User login Successfully!",loginResponse, HttpStatus.OK);
         }
 
-        return response.createErrorResponseMessage("Invalid credentials", HttpStatus.UNAUTHORIZED);
+        return response.createErrorResponseMessage("Invalid credentials", HttpStatus.BAD_REQUEST);
     }
 
 

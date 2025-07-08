@@ -14,6 +14,9 @@ public interface PostControllerEndpoint {
     @GetMapping("/all")
     public ResponseEntity<?> allPost();
 
+    @GetMapping("/user/all")
+    public ResponseEntity<?> allUserPost();
+
     @GetMapping("/{postId}")
     public ResponseEntity<?> findPostById(@PathVariable Integer postId);
 

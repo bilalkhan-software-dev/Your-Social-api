@@ -37,7 +37,6 @@ public class AuthServiceImpl implements AuthService {
     @Override
     public boolean registerUser(UserRequest user) {
 
-
         boolean isExist = checkUsernameAlreadyTakenOrNot(user.getEmail());
         if (isExist) {
             log.info("User already exist with username :{}", user.getEmail());
@@ -47,11 +46,13 @@ public class AuthServiceImpl implements AuthService {
         User mappedUser = mapper.map(user, User.class);
 
         mappedUser.setPassword(passwordEncoder.encode(user.getPassword()));
+        mappedUser.setBio("Hey there! I'm new here. More about me coming soon.");
+        mappedUser.setImage("https://res.cloudinary.com/dkkgqafqw/image/upload/v1748716426/c20bf2b8-6e3a-4a18-8e69-63ebfe519f0d.png");
+        mappedUser.setBanner("https://res.cloudinary.com/dkkgqafqw/image/upload/v1748633362/0150a160-666b-40a7-894f-443f83ef0ac5.jpg");
         User saved = userRepository.save(mappedUser);
         log.info("User registered  with username :{} and details :{}", user.getEmail(), user);
         return !ObjectUtils.isEmpty(saved);
     }
-
     @Override
     public LoginResponse login(LoginRequest user) {
 

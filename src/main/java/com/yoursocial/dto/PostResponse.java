@@ -17,6 +17,9 @@ public class PostResponse {
     private String video;
     private Integer authorId;
     private String authorEmail;
+    private String authorFirstName;
+    private String authorLastName;
+    private String authorProfilePic;
     private Boolean isLiked;
     private Boolean isSaved;
     private Integer postLikesCount;

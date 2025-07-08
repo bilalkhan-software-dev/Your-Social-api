@@ -8,6 +8,7 @@ import org.springframework.security.access.method.P;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Entity
 @Table(name = "users")
@@ -25,16 +26,29 @@ public class User {
     private String password;
     private String gender;
 
+    @Column(length = 100)
+    private String bio;
 
-    @ElementCollection
+    @Column(length = 400)
+    private String image;
+
+    @Column(length = 400)
+    private String banner;
+
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<Integer> followers = new ArrayList<>();
 
-    @ElementCollection
+    @ElementCollection(fetch = FetchType.EAGER)
     private List<Integer> following = new ArrayList<>();
 
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     private List<Post> savedPost = new ArrayList<>();
+
+    // Helper method
+    public List<Integer> getSavedPostIds() {
+        return savedPost.stream().map(Post::getId).collect(Collectors.toList());
+    }
 }
 
 

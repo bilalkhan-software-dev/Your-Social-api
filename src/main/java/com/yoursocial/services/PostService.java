@@ -19,5 +19,7 @@ public interface PostService {
 
     PostResponse likedPost(Integer postId);
 
+    List<PostResponse> getAllUserPost();
+
 
 }

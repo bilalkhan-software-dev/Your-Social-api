@@ -46,6 +46,17 @@ public class PostController implements PostControllerEndpoint {
     }
 
     @Override
+    public ResponseEntity<?> allUserPost() {
+        List<PostResponse> userPosts = postService.getAllUserPost();
+
+        if (CollectionUtils.isEmpty(userPosts)){
+            return ResponseEntity.noContent().build();
+        }
+
+        return response.createBuildResponse("All post of the user retrieved successfully!",userPosts,HttpStatus.OK);
+    }
+
+    @Override
     public ResponseEntity<?> findPostById(Integer postId) {
         PostResponse postDetails = postService.findPostById(postId);
         return response.createBuildResponse(

@@ -21,6 +21,9 @@ public class UserResponse {
     private String lastName;
     private String email;
     private String gender;
+    private String image;
+    private String banner;
+    private String bio;
 
     private List<Integer> followers = new ArrayList<>();
     private List<Integer> following = new ArrayList<>();
@@ -46,9 +49,6 @@ public class UserResponse {
 
         private List<Integer> likedByUserIds = new ArrayList<>();
         private LocalDateTime createdAt;
-
-
     }
-
 
 }
