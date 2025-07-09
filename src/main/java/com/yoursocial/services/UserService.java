@@ -23,7 +23,7 @@ public interface UserService {
 
     List<UserResponse> getAllUsers();
 
-    boolean followUser(Integer userId);
+    UserResponse followUser(Integer userId);
 
     void deleteUser(Integer userId);
 

@@ -1,5 +1,6 @@
 package com.yoursocial.repository;
 
+import com.yoursocial.entity.Post;
 import com.yoursocial.entity.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -25,6 +26,11 @@ public interface UserRepository extends JpaRepository<User, Integer> {
             " or lower(u.lastName) like lower(concat('%',:query,'%'))" +
             " or lower(u.email) like lower(concat('%',:query,'%'))")
     List<User> searchUser(@Param("query") String query);
+
+
+    @Query("SELECT u.savedPost FROM User u WHERE u = :user")
+    List<Post> findSavedPostsByUser(@Param("user") User user);
+
 
     boolean existsByEmail(String email);
 

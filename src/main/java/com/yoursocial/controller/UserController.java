@@ -27,10 +27,10 @@ public class UserController implements UserControllerEndpoint {
     public ResponseEntity<?> useProfile() {
 
         UserResponse userResponse = userService.showUserProfile();
-        if (userResponse == null){
-            return response.createErrorResponseMessage("No user found maybe token invalid!",HttpStatus.UNAUTHORIZED);
+        if (userResponse == null) {
+            return response.createErrorResponseMessage("No user found maybe token invalid!", HttpStatus.UNAUTHORIZED);
         }
-        return response.createBuildResponse("User Profile Details",userResponse,HttpStatus.OK);
+        return response.createBuildResponse("User Profile Details", userResponse, HttpStatus.OK);
     }
 
     @Override
@@ -50,7 +50,7 @@ public class UserController implements UserControllerEndpoint {
             return response.createBuildResponseMessage("No user registered till yet", HttpStatus.NO_CONTENT);
         }
 
-        return response.createBuildResponse("All logged in user",allUsers, HttpStatus.OK);
+        return response.createBuildResponse("All logged in user", allUsers, HttpStatus.OK);
     }
 
     @Override
@@ -61,7 +61,7 @@ public class UserController implements UserControllerEndpoint {
         if (CollectionUtils.isEmpty(searchedUser)) {
             return response.createBuildResponseMessage("No result found with query: " + query, HttpStatus.BAD_REQUEST);
         }
-        return response.createBuildResponse("Searched users ",searchedUser, HttpStatus.OK);
+        return response.createBuildResponse("Searched users ", searchedUser, HttpStatus.OK);
     }
 
     @Override
@@ -69,7 +69,7 @@ public class UserController implements UserControllerEndpoint {
 
         UserResponse updatedUserDetails = userService.updateUser(userRequest);
         if (!ObjectUtils.isEmpty(updatedUserDetails)) {
-            return response.createBuildResponse("User account updated successfully!",updatedUserDetails, HttpStatus.OK);
+            return response.createBuildResponse("User account updated successfully!", updatedUserDetails, HttpStatus.OK);
         }
 
         return response.createErrorResponseMessage("Update failed", HttpStatus.BAD_REQUEST);
@@ -79,15 +79,17 @@ public class UserController implements UserControllerEndpoint {
     @Override
     public ResponseEntity<?> followUser(Integer followedUserId) {
 
-        boolean isFollowed = userService.followUser(followedUserId);
+        UserResponse followedUser = userService.followUser(followedUserId);
 
-        UserResponse user = userService.findUserById(followedUserId);
+        String message = followedUser.getIsFollowed()
+                ? "Successfully followed user"
+                : "Successfully unfollow user ";
 
-        if (isFollowed) {
-            return response.createBuildResponseMessage("Successfully follow " + user.getFirstName() + " " + user.getLastName(), HttpStatus.OK);
+        if (!ObjectUtils.isEmpty(followedUser)) {
+            return response.createBuildResponse(message, followedUser, HttpStatus.OK);
         }
 
-        return response.createBuildResponseMessage("Successfully unfollow " + user.getFirstName() + " " + user.getLastName(), HttpStatus.OK);
+        return response.createErrorResponseMessage("Followed/Unfollowed request failed. Try again later", HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
 
@@ -95,6 +97,6 @@ public class UserController implements UserControllerEndpoint {
     public ResponseEntity<?> getUserDetailsById(Integer userId) {
 
         UserResponse user = userService.findUserById(userId);
-        return response.createBuildResponse("Required id user details",user, HttpStatus.OK);
+        return response.createBuildResponse("Required id user details", user, HttpStatus.OK);
     }
 }

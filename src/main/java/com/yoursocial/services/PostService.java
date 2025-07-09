@@ -21,5 +21,8 @@ public interface PostService {
 
     List<PostResponse> getAllUserPost();
 
+    List<PostResponse> getUserSavedPost();
+
+    PostResponse updatePost(Integer postId,PostRequest postRequest);
 
 }

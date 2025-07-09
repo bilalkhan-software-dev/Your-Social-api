@@ -16,7 +16,7 @@ import java.util.List;
 public class UserResponse {
 
 
-    private Integer id ;
+    private Integer id;
     private String firstName;
     private String lastName;
     private String email;
@@ -28,9 +28,10 @@ public class UserResponse {
     private List<Integer> followers = new ArrayList<>();
     private List<Integer> following = new ArrayList<>();
 
+    @Builder.Default
+    private Boolean isFollowed = false;
 
     private List<PostResponse> savedPost = new ArrayList<>();
-
 
     @AllArgsConstructor
     @NoArgsConstructor

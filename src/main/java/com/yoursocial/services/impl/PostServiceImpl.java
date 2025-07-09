@@ -14,15 +14,19 @@ import com.yoursocial.services.PostService;
 import com.yoursocial.util.CommonUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class PostServiceImpl implements PostService {
@@ -53,9 +57,16 @@ public class PostServiceImpl implements PostService {
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found"));
 
+
         if (!post.getUser().getId().equals(userId)) {
             throw new IllegalArgumentException("You can't delete another user's post");
         }
+
+        // when deleting post also removing it from the save post list
+        post.getSavedByUsers().forEach(user -> {
+            user.getSavedPost().remove(post);
+            userRepository.save(user);
+        });
         postRepository.delete(post);
     }
 
@@ -68,6 +79,7 @@ public class PostServiceImpl implements PostService {
 
     @Override
     public List<PostResponse> allPost() {
+
         return postRepository.findAll().stream()
                 .map(this::getPostResponse)
                 .toList();
@@ -82,12 +94,22 @@ public class PostServiceImpl implements PostService {
         return loggedInUserPosts.stream().map(this::getPostResponse).toList();
     }
 
+    @Override
+    public List<PostResponse> getUserSavedPost() {
+        User loggedInUser = util.getLoggedInUserDetails();
+
+        List<Post> savePost = userRepository.findSavedPostsByUser(loggedInUser);
+        return savePost.stream().map(this::getPostResponse).toList();
+    }
+
+    @Transactional
+    @Override
     public PostResponse likedPost(Integer postId) {
         User user = util.getLoggedInUserDetails();
         Post post = postRepository.findById(postId)
                 .orElseThrow(() -> new ResourceNotFoundException("Post not found with id: " + postId));
 
-        // Initialize like list if null
+        // Initialize like a list if null
         if (post.getLike() == null) {
             post.setLike(new ArrayList<>());
         }
@@ -123,28 +145,88 @@ public class PostServiceImpl implements PostService {
                 .orElseThrow(() -> new ResourceNotFoundException("User not found"));
 
         boolean isCurrentlySaved = user.getSavedPost().contains(post);
+
         if (isCurrentlySaved) {
+            // Unsaving the post
             user.getSavedPost().remove(post);
+            post.getSavedByUsers().remove(user);
         } else {
+            // Saving the post
             user.getSavedPost().add(post);
+            post.getSavedByUsers().add(user);
         }
 
         userRepository.save(user);
+        postRepository.save(post);
+
         PostResponse response = getPostResponse(post);
         response.setIsSaved(!isCurrentlySaved);
         return response;
     }
 
+    @Transactional
+    @Override
+    public PostResponse updatePost(Integer postId, PostRequest postRequest) {
+
+        Integer loggedInUser = util.getLoggedInUserDetails().getId();
+
+
+        Post existingPost = postRepository.findById(postId).orElseThrow(
+                () -> new ResourceNotFoundException("Post not found with id: " + postId)
+        );
+
+        if (!existingPost.getUser().getId().equals(loggedInUser)) {
+            throw new IllegalArgumentException("You can't update another user post");
+        }
+
+        if (postRequest.getVideo() != null) {
+            existingPost.setVideo(postRequest.getVideo());
+        }
+
+        if (postRequest.getImage() != null) {
+            existingPost.setImage(postRequest.getImage());
+        }
+
+        if (postRequest.getCaption() != null) {
+            existingPost.setCaption(postRequest.getCaption());
+        }
+
+        Post isUpdated = postRepository.save(existingPost);
+
+        PostResponse updateResponse = null;
+
+        if (!ObjectUtils.isEmpty(isUpdated)) {
+            updateResponse = getPostResponse(isUpdated);
+            updateResponse.setIsUpdated(true);
+        } else {
+            updateResponse = getPostResponse(existingPost);
+            updateResponse.setIsUpdated(false);
+        }
+
+        return updateResponse;
+    }
 
     private PostResponse getPostResponse(Post post) {
+
         User author = post.getUser();
 
+        User loggedInUser = util.getLoggedInUserDetails();
+
+        // sever side logic if post is saved and like by loggedInUser
+        List<User> likes = post.getLike();
+
+        List<Post> savedPost = loggedInUser.getSavedPost();
+
+        boolean isPostLikedByCurrentUser = likes.stream().filter(Objects::nonNull).anyMatch(u -> u.getId().equals(loggedInUser.getId()));
+        boolean isSavedPostByCurrentUser = savedPost.stream().anyMatch(p -> p != null && p.getId().equals(post.getId()));
         return PostResponse.builder()
                 .postId(post.getId())
                 .caption(post.getCaption())
                 .image(post.getImage())
                 .createdAt(post.getCreatedAt())
                 .video(post.getVideo())
+                .isLiked(isPostLikedByCurrentUser)
+                .isSaved(isSavedPostByCurrentUser)
                 .authorId(author.getId())
                 .authorEmail(author.getEmail())
                 .authorFirstName(author.getFirstName())
@@ -152,16 +234,20 @@ public class PostServiceImpl implements PostService {
                 .authorProfilePic(author.getImage())
                 .postLikesCount(post.getLike().size())
                 .commentsCount(post.getComments().size())
-                .savesCount(author.getSavedPost().size())
+                .savesCount(post.getSavedByUsers().size())
                 .likedByUserIds(post.getLike().stream().map(User::getId).toList())
                 .comments(post.getComments().stream().map(comment ->
                         CommentResponse.builder()
                                 .commentId(comment.getId())
                                 .content(comment.getContent())
+                                .createAt(comment.getCommentCreatedAt())
                                 .commentUserDetails(CommentUserDetails.builder()
-                                        .id(author.getId())
-                                        .firstName(author.getFirstName())
-                                        .email(author.getEmail())
+                                        .id(comment.getUser().getId())
+                                        .firstName(comment.getUser().getFirstName())
+                                        .lastName(comment.getUser()
+                                                .getLastName())
+                                        .profilePic(comment.getUser().getImage())
+                                        .email(comment.getUser().getEmail())
                                         .build())
                                 .commentLikes(comment.getLiked().stream().map(User::getId).toList())
                                 .build()).toList()

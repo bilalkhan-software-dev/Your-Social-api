@@ -47,8 +47,9 @@ public class AuthServiceImpl implements AuthService {
 
         mappedUser.setPassword(passwordEncoder.encode(user.getPassword()));
         mappedUser.setBio("Hey there! I'm new here. More about me coming soon.");
-        mappedUser.setImage("https://res.cloudinary.com/dkkgqafqw/image/upload/v1748716426/c20bf2b8-6e3a-4a18-8e69-63ebfe519f0d.png");
-        mappedUser.setBanner("https://res.cloudinary.com/dkkgqafqw/image/upload/v1748633362/0150a160-666b-40a7-894f-443f83ef0ac5.jpg");
+
+//        mappedUser.setImage("https://res.cloudinary.com/dkkgqafqw/image/upload/v1748716426/c20bf2b8-6e3a-4a18-8e69-63ebfe519f0d.png");
+        mappedUser.setBanner("https://t4.ftcdn.net/jpg/08/50/30/01/360_F_850300178_2R0d9z8EiG6hN8Yj5QaBEYJAEVFflJly.jpg");
         User saved = userRepository.save(mappedUser);
         log.info("User registered  with username :{} and details :{}", user.getEmail(), user);
         return !ObjectUtils.isEmpty(saved);

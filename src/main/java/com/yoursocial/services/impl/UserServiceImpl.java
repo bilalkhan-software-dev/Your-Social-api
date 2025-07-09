@@ -12,7 +12,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -100,8 +103,7 @@ public class UserServiceImpl implements UserService {
 
         List<User> userList = userRepo.findAll();
 
-        return userList.stream().map(UserServiceImpl::getUserResponse
-                )
+        return userList.stream().map(this::getUserResponse)
                 .toList();
     }
 
@@ -117,7 +119,7 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public boolean followUser(Integer userId) {
+    public UserResponse followUser(Integer userId) {
 
         Integer loggedInUserId = util.getLoggedInUserDetails().getId();
 
@@ -130,20 +132,28 @@ public class UserServiceImpl implements UserService {
         User followee = userRepo.findById(userId)
                 .orElseThrow(() -> new ResourceNotFoundException("User not found with id: " + userId));
 
+
         boolean isFollowing = follower.getFollowing().contains(userId);
+
+        UserResponse response = null;
 
         if (isFollowing) {
             follower.getFollowing().remove(userId);
             followee.getFollowers().remove(loggedInUserId);
+            User save = userRepo.save(follower);
+            userRepo.save(followee);
+            response = getUserResponse(save);
+            response.setIsFollowed(false);
         } else {
             follower.getFollowing().add(userId);
             followee.getFollowers().add(loggedInUserId);
+            User saved = userRepo.save(follower);
+            userRepo.save(followee);
+            response = getUserResponse(saved);
+            response.setIsFollowed(true);
         }
 
-        userRepo.save(follower);
-        userRepo.save(followee);
-        // Returns true if now following, false if now unfollowed
-        return !isFollowing;
+        return response;
     }
 
 
@@ -152,11 +162,17 @@ public class UserServiceImpl implements UserService {
 
         List<User> searchedUser = userRepo.searchUser(query);
 
-        return searchedUser.stream().map(UserServiceImpl::getUserResponse).toList();
+        return searchedUser.stream().map(this::getUserResponse).toList();
     }
 
 
-    public static UserResponse getUserResponse(User user) {
+    public UserResponse getUserResponse(User user) {
+
+        User loggedInUserId = util.getLoggedInUserDetails();
+
+        boolean ifLoggedInUserFollowedUser = Optional.ofNullable(loggedInUserId.getFollowing()).orElse(Collections.emptyList()).contains(user.getId());
+
+
         return UserResponse.builder()
                 .id(user.getId())
                 .gender(user.getGender())
@@ -168,6 +184,7 @@ public class UserServiceImpl implements UserService {
                 .banner(user.getBanner())
                 .following(user.getFollowing())
                 .followers(user.getFollowers())
+                .isFollowed(ifLoggedInUserFollowedUser)
                 .savedPost(user.getSavedPost().stream().map(post -> PostResponse.builder()
                         .postId(post.getId())
                         .image(post.getImage())

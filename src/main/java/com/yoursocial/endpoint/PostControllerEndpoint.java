@@ -17,6 +17,9 @@ public interface PostControllerEndpoint {
     @GetMapping("/user/all")
     public ResponseEntity<?> allUserPost();
 
+    @GetMapping("/user/save/all")
+    public ResponseEntity<?> userSavedPost();
+
     @GetMapping("/{postId}")
     public ResponseEntity<?> findPostById(@PathVariable Integer postId);
 
@@ -29,6 +32,10 @@ public interface PostControllerEndpoint {
 
     @PutMapping("/saved/{postId}")
     public ResponseEntity<?> savePost(@PathVariable Integer postId);
+
+    @PutMapping("/update/{postId}")
+    public ResponseEntity<?> updatePost(@PathVariable Integer postId,@RequestBody PostRequest postRequest);
+
 
 
 }

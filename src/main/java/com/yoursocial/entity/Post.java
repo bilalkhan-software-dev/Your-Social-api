@@ -1,6 +1,7 @@
 package com.yoursocial.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -33,6 +34,11 @@ public class Post {
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
+
+
+    @ManyToMany(mappedBy = "savedPost")
+    @JsonIgnore
+    private List<User> savedByUsers = new ArrayList<>();
 
 
     @ManyToMany

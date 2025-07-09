@@ -49,11 +49,23 @@ public class PostController implements PostControllerEndpoint {
     public ResponseEntity<?> allUserPost() {
         List<PostResponse> userPosts = postService.getAllUserPost();
 
-        if (CollectionUtils.isEmpty(userPosts)){
+        if (CollectionUtils.isEmpty(userPosts)) {
             return ResponseEntity.noContent().build();
         }
 
-        return response.createBuildResponse("All post of the user retrieved successfully!",userPosts,HttpStatus.OK);
+        return response.createBuildResponse("All post of the user retrieved successfully!", userPosts, HttpStatus.OK);
+    }
+
+    @Override
+    public ResponseEntity<?> userSavedPost() {
+        List<PostResponse> userSavedPosts = postService.getUserSavedPost();
+
+        if (CollectionUtils.isEmpty(userSavedPosts)) {
+            return ResponseEntity.noContent().build();
+        }
+
+        return response.createBuildResponse("All saved post of the user retrieved successfully!", userSavedPosts, HttpStatus.OK);
+
     }
 
     @Override
@@ -101,5 +113,16 @@ public class PostController implements PostControllerEndpoint {
                 postResponse,
                 HttpStatus.OK
         );
+    }
+
+    @Override
+    public ResponseEntity<?> updatePost(Integer postId, PostRequest postRequest) {
+
+        PostResponse isUpdated = postService.updatePost(postId, postRequest);
+        String message = isUpdated.getIsUpdated() ?
+                "Post updated successfully!"
+                : "Post update failed!";
+        return response.createBuildResponse(message, isUpdated, HttpStatus.OK);
+
     }
 }

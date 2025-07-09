@@ -18,11 +18,9 @@ import java.util.List;
 public class CommentResponse {
 
     private Integer id;
-
     private String content;
     private UserResponse user;
     private LocalDateTime commentCreatedAt;
-
 
     private Integer totalLikesOnComment;
     private List<UserResponse> commentLikedByUsers = new ArrayList<>();

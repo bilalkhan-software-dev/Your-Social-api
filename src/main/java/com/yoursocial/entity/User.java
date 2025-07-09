@@ -43,12 +43,13 @@ public class User {
 
 
     @ManyToMany(fetch = FetchType.EAGER)
-    private List<Post> savedPost = new ArrayList<>();
-
-    // Helper method
-    public List<Integer> getSavedPostIds() {
-        return savedPost.stream().map(Post::getId).collect(Collectors.toList());
-    }
+    @JoinTable(
+            name = "user_saved_posts",
+            joinColumns = @JoinColumn(name = "user_id"),
+            inverseJoinColumns = @JoinColumn(name = "post_id")
+    )
+    List<Post> savedPost = new ArrayList<>();
+    
 }
 
 
