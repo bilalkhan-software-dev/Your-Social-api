@@ -183,6 +183,7 @@ public class UserServiceImpl implements UserService {
                 .image(user.getImage())
                 .banner(user.getBanner())
                 .following(user.getFollowing())
+                .isRequestedUser(false)
                 .followers(user.getFollowers())
                 .isFollowed(ifLoggedInUserFollowedUser)
                 .savedPost(user.getSavedPost().stream().map(post -> PostResponse.builder()

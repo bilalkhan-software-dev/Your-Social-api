@@ -27,9 +27,7 @@ public class UserController implements UserControllerEndpoint {
     public ResponseEntity<?> useProfile() {
 
         UserResponse userResponse = userService.showUserProfile();
-        if (userResponse == null) {
-            return response.createErrorResponseMessage("No user found maybe token invalid!", HttpStatus.UNAUTHORIZED);
-        }
+        userResponse.setIsRequestedUser(true);
         return response.createBuildResponse("User Profile Details", userResponse, HttpStatus.OK);
     }
 

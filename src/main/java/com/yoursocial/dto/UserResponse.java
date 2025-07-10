@@ -31,6 +31,9 @@ public class UserResponse {
     @Builder.Default
     private Boolean isFollowed = false;
 
+    @Builder.Default
+    private Boolean isRequestedUser = false ;
+
     private List<PostResponse> savedPost = new ArrayList<>();
 
     @AllArgsConstructor
