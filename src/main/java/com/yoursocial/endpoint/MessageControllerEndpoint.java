@@ -15,6 +15,4 @@ public interface MessageControllerEndpoint {
     public ResponseEntity<?> getAllMessageOfTheChat(@PathVariable Integer chatId);
 
 
-
-
 }

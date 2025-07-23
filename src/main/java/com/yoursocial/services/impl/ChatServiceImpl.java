@@ -101,6 +101,7 @@ public class ChatServiceImpl implements ChatService {
                                 .userId(user.getId())
                                 .fullName(user.getFirstName() + " " + user.getLastName())
                                 .email(user.getEmail())
+                                .image(user.getImage())
                                 .build())
                         .toList())
                 .build();
