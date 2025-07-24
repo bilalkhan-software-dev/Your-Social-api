@@ -3,6 +3,7 @@ package com.yoursocial.services.impl;
 import com.yoursocial.dto.ChatRequest;
 import com.yoursocial.dto.ChatResponse;
 import com.yoursocial.dto.ChatResponse.UserResponse;
+import com.yoursocial.dto.ChatResponse.MessageResponse;
 import com.yoursocial.entity.Chat;
 import com.yoursocial.entity.User;
 import com.yoursocial.exception.ResourceNotFoundException;
@@ -13,14 +14,10 @@ import com.yoursocial.util.CommonUtil;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.orm.ObjectOptimisticLockingFailureException;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Isolation;
 
 import java.time.LocalDateTime;
-import java.util.ConcurrentModificationException;
 import java.util.List;
-import java.util.Set;
 
 @Service
 @Transactional
@@ -93,7 +90,7 @@ public class ChatServiceImpl implements ChatService {
                 .id(chat.getId())
                 .chatName(chat.getChatName())
                 .chatImage(chat.getChatImage())
-                .chatCreatAt(chat.getChatCreatedAt())
+                .chatCreatedAt(chat.getChatCreatedAt())
                 .isChatCreated(true)
                 .isChatAlreadyCreated(false)
                 .users(chat.getUsers().stream()
@@ -104,6 +101,14 @@ public class ChatServiceImpl implements ChatService {
                                 .image(user.getImage())
                                 .build())
                         .toList())
+                .messages(chat.getMessages().stream()
+                        .map(message -> MessageResponse.builder()
+                                .id(message.getId())
+                                .content(message.getContent())
+                                .image(message.getImage())
+                                .createdAt(message.getMessageCreatedAt())
+                                .build()
+                ).toList())
                 .build();
     }
 }

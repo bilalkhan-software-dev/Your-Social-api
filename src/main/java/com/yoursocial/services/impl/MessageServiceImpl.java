@@ -15,7 +15,6 @@ import com.yoursocial.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
-import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
@@ -37,9 +36,9 @@ public class MessageServiceImpl implements MessageService {
                 .orElseThrow(() -> new ResourceNotFoundException("Chat not found with id: " + chatId));
 
         // Verify user is part of the chat
-        if (!chat.getUsers().contains(loggedInUser)) {
-            throw new IllegalArgumentException("User is not part of this chat");
-        }
+//        if (!chat.getUsers().contains(loggedInUser)) {
+//            throw new IllegalArgumentException("User is not part of this chat");
+//        }
 
         Message message = mapper.map(messageRequest, Message.class);
         message.setMessageCreatedAt(LocalDateTime.now());
@@ -78,7 +77,7 @@ public class MessageServiceImpl implements MessageService {
                         .id(message.getChat().getId())
                         .chatName(message.getChat().getChatName())
                         .chatImage(message.getChat().getChatImage())
-                        .chatCreatAt(message.getChat().getChatCreatedAt())
+                        .chatCreatedAt(message.getChat().getChatCreatedAt())
                         .build())
                 .build();
     }

@@ -14,7 +14,7 @@ public class ChatResponse {
     private Integer id;
     private String chatName;
     private String chatImage;
-    private LocalDateTime chatCreatAt;
+    private LocalDateTime chatCreatedAt;
 
     private boolean isChatCreated;
     private boolean isChatAlreadyCreated;
@@ -32,6 +32,9 @@ public class ChatResponse {
     @Builder.Default
     private List<UserResponse> users = new ArrayList<>();
 
+    @Builder.Default
+    private List<MessageResponse> messages = new ArrayList<>();
+
 
     @Data
     @Builder
@@ -44,5 +47,12 @@ public class ChatResponse {
 
     }
 
-
+    @Data
+    @Builder
+    public static class MessageResponse {
+        private Integer id;
+        private String content;
+        private String image;
+        private LocalDateTime createdAt;
+    }
 }

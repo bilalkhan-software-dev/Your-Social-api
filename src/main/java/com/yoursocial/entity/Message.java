@@ -15,7 +15,7 @@ public class Message {
 
     private String content;
 
-    private String image; // store image url in database
+    private String image; // storing image url in database
 
     @ManyToOne
     private User user;
