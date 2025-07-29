@@ -28,6 +28,7 @@ public class MessageResponse {
         private Integer userId;
         private String fullName;
         private String email;
+        private String image;
     }
 }
 

@@ -35,13 +35,12 @@ public class Post {
     @JoinColumn(name = "user_id", nullable = false)
     private User user;
 
-
     @ManyToMany(mappedBy = "savedPost")
     @JsonIgnore
     private List<User> savedByUsers = new ArrayList<>();
 
 
-    @ManyToMany
+    @ManyToMany(fetch=FetchType.EAGER)
     @JoinTable(
             name = "post_likes",
             joinColumns = @JoinColumn(name = "post_id"),

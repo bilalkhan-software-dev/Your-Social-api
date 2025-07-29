@@ -1,10 +1,7 @@
 package com.yoursocial.handler;
 
 
-import com.yoursocial.exception.DuplicateLikeException;
-import com.yoursocial.exception.ExistDataException;
-import com.yoursocial.exception.JwtTokenExpiredException;
-import com.yoursocial.exception.ResourceNotFoundException;
+import com.yoursocial.exception.*;
 import com.yoursocial.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,6 +26,12 @@ public class GlobalExceptionHandler {
     public ResponseEntity<?> handleException(Exception e) {
         log.error("Unhandled exception :{}", e.getMessage());
         return util.createErrorResponseMessage("An unexpected error => " + e.getMessage() + " <= occurred.", HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+
+    @ExceptionHandler(ResetPasswordException.class)
+    public ResponseEntity<?> handleOTPException(ResetPasswordException e) {
+        log.error("Invalid otp exception :{}", e.getMessage());
+        return util.createErrorResponseMessage("Invalid OTP", HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler(NullPointerException.class)

@@ -1,8 +1,12 @@
 package com.yoursocial.endpoint;
 
+import com.yoursocial.dto.ResetPasswordRequest;
 import com.yoursocial.dto.UpdateUserRequest;
+import jakarta.mail.MessagingException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.UnsupportedEncodingException;
 
 @RequestMapping("/api/v1/user") // required authentication
 public interface UserControllerEndpoint {
@@ -28,6 +32,20 @@ public interface UserControllerEndpoint {
 
     @GetMapping("/{userId}")
     public ResponseEntity<?> getUserDetailsById(@PathVariable Integer userId);
+
+    @GetMapping("/reset-password-request/{email}")
+    public ResponseEntity<?> sendEmailForResetPassword(@PathVariable String email) throws MessagingException, UnsupportedEncodingException;
+
+    @GetMapping("/verify-otp/{otp}/{email}")
+    public ResponseEntity<?> verifyOTP(@PathVariable Integer otp,@PathVariable String email);
+
+    @PutMapping("/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest resetPasswordRequest);
+
+
+
+
+
 
 
 

@@ -4,6 +4,7 @@ import lombok.Builder;
 import lombok.Data;
 
 import java.time.LocalDateTime;
+import com.yoursocial.dto.MessageResponse.MessageUserDetails;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -54,5 +55,6 @@ public class ChatResponse {
         private String content;
         private String image;
         private LocalDateTime createdAt;
+        private MessageUserDetails messageUserDetails;
     }
 }

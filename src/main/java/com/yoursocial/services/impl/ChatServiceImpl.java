@@ -4,6 +4,7 @@ import com.yoursocial.dto.ChatRequest;
 import com.yoursocial.dto.ChatResponse;
 import com.yoursocial.dto.ChatResponse.UserResponse;
 import com.yoursocial.dto.ChatResponse.MessageResponse;
+import com.yoursocial.dto.MessageResponse.MessageUserDetails;
 import com.yoursocial.entity.Chat;
 import com.yoursocial.entity.User;
 import com.yoursocial.exception.ResourceNotFoundException;
@@ -107,8 +108,14 @@ public class ChatServiceImpl implements ChatService {
                                 .content(message.getContent())
                                 .image(message.getImage())
                                 .createdAt(message.getMessageCreatedAt())
+                                .messageUserDetails(MessageUserDetails.builder()
+                                        .email(message.getUser().getEmail())
+                                        .fullName(message.getUser().getFirstName() + " " + message.getUser().getLastName())
+                                        .image(message.getUser().getImage())
+                                        .userId(message.getUser().getId())
+                                        .build())
                                 .build()
-                ).toList())
+                        ).toList())
                 .build();
     }
 }
