@@ -36,9 +36,12 @@ public class MessageServiceImpl implements MessageService {
                 .orElseThrow(() -> new ResourceNotFoundException("Chat not found with id: " + chatId));
 
         // Verify user is part of the chat
-//        if (!chat.getUsers().contains(loggedInUser)) {
-//            throw new IllegalArgumentException("User is not part of this chat");
-//        }
+        boolean isParticipant = chat.getUsers().stream()
+                .anyMatch(user -> user.getId().equals(loggedInUser.getId()));
+
+        if (!isParticipant) {
+            throw new IllegalArgumentException("User is not part of this chat");
+        }
 
         Message message = mapper.map(messageRequest, Message.class);
         message.setMessageCreatedAt(LocalDateTime.now());

@@ -1,21 +1,30 @@
 package com.yoursocial.services.impl;
 
+import com.yoursocial.dto.ResetPasswordRequest;
 import com.yoursocial.dto.UpdateUserRequest;
 import com.yoursocial.dto.UserResponse;
 import com.yoursocial.dto.UserResponse.PostResponse;
 import com.yoursocial.entity.User;
+import com.yoursocial.exception.ResetPasswordException;
 import com.yoursocial.exception.ResourceNotFoundException;
 import com.yoursocial.repository.UserRepository;
 import com.yoursocial.services.UserService;
 import com.yoursocial.util.CommonUtil;
+import com.yoursocial.util.EmailSendingTemplate;
+import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
 
-import java.util.Collection;
+import java.io.UnsupportedEncodingException;
+import java.security.SecureRandom;
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+
+import static com.yoursocial.util.AppConstant.OTP_EXPIRATION_MINUTES;
 
 @Service
 @RequiredArgsConstructor
@@ -23,7 +32,10 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepo;
     private final CommonUtil util;
+    private final PasswordEncoder passwordEncoder;
+    private final EmailService emailService;
 
+    private final SecureRandom random = new SecureRandom();
 
     @Override
     public UserResponse showUserProfile() {
@@ -152,7 +164,6 @@ public class UserServiceImpl implements UserService {
             response = getUserResponse(saved);
             response.setIsFollowed(true);
         }
-
         return response;
     }
 
@@ -165,6 +176,71 @@ public class UserServiceImpl implements UserService {
         return searchedUser.stream().map(this::getUserResponse).toList();
     }
 
+    @Override
+    public boolean sendResetPasswordOTP(String email) throws MessagingException, UnsupportedEncodingException {
+
+        User user = userRepo.findByEmail(email).orElseThrow(
+                () -> new ResourceNotFoundException("User not found with email: " + email)
+        );
+        int otp = generateOTP();
+
+        String body = EmailSendingTemplate.sendEmailForPasswordReset(user.getFirstName(), otp);
+        emailService.sendEmail(user.getEmail(), "Reset password Your Social Account", body);
+
+        user.setResetPasswordCode(otp);
+        user.setOtpGeneratedTime(LocalDateTime.now());
+        User isUserSaved = userRepo.save(user);
+
+        return !ObjectUtils.isEmpty(isUserSaved);
+    }
+
+    @Override
+    public boolean verifyResetPasswordOTP(Integer otp, String email) {
+
+        User user = userRepo.findByResetPasswordCodeAndEmail(otp, email).orElseThrow(
+                () -> new ResetPasswordException("Invalid OTP")
+        );
+
+        if (isOtpExpired(user.getOtpGeneratedTime())) {
+            user.setResetPasswordCode(null);
+            user.setOtpGeneratedTime(null);
+            userRepo.save(user);
+            throw new ResetPasswordException("OTP has expired. Generate again for reset password");
+        }
+
+        user.setOtpGeneratedTime(null);
+        User isSuccessfullyVerifiedOtp = userRepo.save(user);
+
+        return !ObjectUtils.isEmpty(isSuccessfullyVerifiedOtp);
+    }
+
+    @Override
+    public boolean resetPasswordOTP(ResetPasswordRequest request) {
+
+        User user = userRepo.findByEmail(request.getEmail()).orElseThrow(
+                () -> new ResourceNotFoundException("User not found with email: " + request.getEmail())
+        );
+
+        if (user.getResetPasswordCode() == null) {
+            throw new ResetPasswordException("Password reset not initialized or OTP has expired");
+        }
+
+        user.setPassword(passwordEncoder.encode(request.getNewPassword()));
+        user.setResetPasswordCode(null);
+        User isPasswordSuccessfullyReset = userRepo.save(user);
+
+        return !ObjectUtils.isEmpty(isPasswordSuccessfullyReset);
+    }
+
+    private int generateOTP() {
+        return 100000 + random.nextInt(900000);
+    }
+
+    private boolean isOtpExpired(LocalDateTime otpGeneratedTime) {
+        return otpGeneratedTime == null ||
+                otpGeneratedTime.plusMinutes(OTP_EXPIRATION_MINUTES)
+                        .isBefore(LocalDateTime.now());
+    }
 
     public UserResponse getUserResponse(User user) {
 

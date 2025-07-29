@@ -4,6 +4,7 @@ package com.yoursocial.entity;
 import jakarta.persistence.*;
 import lombok.*;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -32,6 +33,11 @@ public class User {
     @Column(length = 400)
     private String banner;
 
+    @Column(length = 10)
+    private Integer resetPasswordCode;
+
+    private LocalDateTime otpGeneratedTime;
+
     @ElementCollection(fetch = FetchType.EAGER)
     private List<Integer> followers = new ArrayList<>();
 
@@ -46,7 +52,7 @@ public class User {
             inverseJoinColumns = @JoinColumn(name = "post_id")
     )
     List<Post> savedPost = new ArrayList<>();
-    
+
 }
 
 
