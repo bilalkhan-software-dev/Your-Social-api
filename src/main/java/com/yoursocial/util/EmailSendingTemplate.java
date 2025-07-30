@@ -17,8 +17,8 @@ public class EmailSendingTemplate {
                             padding: 20px;
                         }
                         .header {
-                            background-color: #4CAF50;
-                            color: white;
+                            background-color: #f2f2f3;
+                            color: rgb(10, 115, 165);
                             padding: 10px 20px;
                             text-align: center;
                             border-radius: 5px 5px 0 0;
@@ -47,7 +47,7 @@ public class EmailSendingTemplate {
                         .otp {
                             font-size: 24px;
                             font-weight: bold;
-                            color: #4CAF50;
+                            color: rgb(10, 115, 165);
                             text-align: center;
                             margin: 20px 0;
                         }

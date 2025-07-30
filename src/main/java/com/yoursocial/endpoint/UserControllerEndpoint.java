@@ -33,14 +33,7 @@ public interface UserControllerEndpoint {
     @GetMapping("/{userId}")
     public ResponseEntity<?> getUserDetailsById(@PathVariable Integer userId);
 
-    @GetMapping("/reset-password-request/{email}")
-    public ResponseEntity<?> sendEmailForResetPassword(@PathVariable String email) throws MessagingException, UnsupportedEncodingException;
 
-    @GetMapping("/verify-otp/{otp}/{email}")
-    public ResponseEntity<?> verifyOTP(@PathVariable Integer otp,@PathVariable String email);
-
-    @PutMapping("/reset-password")
-    public ResponseEntity<?> resetPassword(@RequestBody ResetPasswordRequest resetPasswordRequest);
 
 
 

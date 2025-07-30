@@ -100,37 +100,4 @@ public class UserController implements UserControllerEndpoint {
         UserResponse user = userService.findUserById(userId);
         return response.createBuildResponse("Required id user details", user, HttpStatus.OK);
     }
-
-    @Override
-    public ResponseEntity<?> sendEmailForResetPassword(String email) throws MessagingException, UnsupportedEncodingException {
-
-        boolean isEmailSend = userService.sendResetPasswordOTP(email);
-        if (isEmailSend) {
-            return response.createBuildResponseMessage("OTP sent successfully to your email!", HttpStatus.OK);
-        }
-
-        return response.createErrorResponseMessage("OTP send failed!", HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-
-    @Override
-    public ResponseEntity<?> verifyOTP(Integer otp, String email) {
-
-        boolean isOtpVerified = userService.verifyResetPasswordOTP(otp, email);
-        if (isOtpVerified) {
-            return response.createBuildResponseMessage("OTP verified successfully!", HttpStatus.OK);
-        }
-        return response.createErrorResponseMessage("OTP verified failed!", HttpStatus.INTERNAL_SERVER_ERROR);
-    }
-
-    @Override
-    public ResponseEntity<?> resetPassword(ResetPasswordRequest resetPasswordRequest) {
-
-        boolean isPasswordReset = userService.resetPasswordOTP(resetPasswordRequest);
-        if (isPasswordReset) {
-            return response.createBuildResponseMessage("Password reset successfully!", HttpStatus.OK);
-        }
-
-        return response.createErrorResponseMessage("Password reset failed!", HttpStatus.INTERNAL_SERVER_ERROR);
-    }
 }
