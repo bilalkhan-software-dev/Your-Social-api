@@ -1,5 +1,6 @@
 package com.yoursocial.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -21,6 +22,7 @@ public class Message {
     private User user;
 
     @ManyToOne
+    @JsonIgnore
     private Chat chat;
 
     private LocalDateTime messageCreatedAt;

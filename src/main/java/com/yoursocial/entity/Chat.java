@@ -1,6 +1,7 @@
 package com.yoursocial.entity;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.Data;
 
@@ -27,6 +28,7 @@ public class Chat {
     private List<User> users = new ArrayList<>();
 
     @OneToMany(mappedBy = "chat")
+    @JsonIgnore
     private List<Message> messages = new ArrayList<>();
 
     private LocalDateTime chatCreatedAt;

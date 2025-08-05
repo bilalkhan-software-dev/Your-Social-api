@@ -10,6 +10,4 @@ public class ChatRequest {
     private String chatImage;
 
     private Integer createdChatWithId;
-
-
 }
