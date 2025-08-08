@@ -4,6 +4,7 @@ import com.yoursocial.dto.PostRequest;
 import com.yoursocial.dto.PostResponse;
 import com.yoursocial.dto.PostResponse.CommentResponse;
 import com.yoursocial.dto.PostResponse.CommentUserDetails;
+import com.yoursocial.entity.Comment;
 import com.yoursocial.entity.Post;
 import com.yoursocial.entity.User;
 import com.yoursocial.exception.DuplicateLikeException;
@@ -212,9 +213,9 @@ public class PostServiceImpl implements PostService {
 
         User loggedInUser = util.getLoggedInUserDetails();
 
-        // sever side logic if post is saved and like by loggedInUser
+        // sever side logic if post is saved and like by loggedInUser also if comment is liked by loggedInUser (currentUser)
         List<User> likes = post.getLike();
-
+        List<Comment> comments = post.getComments();
         List<Post> savedPost = loggedInUser.getSavedPost();
 
         boolean isPostLikedByCurrentUser = likes.stream().filter(Objects::nonNull).anyMatch(u -> u.getId().equals(loggedInUser.getId()));
@@ -234,23 +235,27 @@ public class PostServiceImpl implements PostService {
                 .authorProfilePic(author.getImage())
                 .postLikesCount(post.getLike().size())
                 .commentsCount(post.getComments().size())
+//                .savesCount(!post.getSavedByUsers().isEmpty() ? post.getSavedByUsers().size() :  0)
                 .savesCount(post.getSavedByUsers().size())
                 .likedByUserIds(post.getLike().stream().map(User::getId).toList())
-                .comments(post.getComments().stream().map(comment ->
-                        CommentResponse.builder()
-                                .commentId(comment.getId())
-                                .content(comment.getContent())
-                                .createAt(comment.getCommentCreatedAt())
-                                .commentUserDetails(CommentUserDetails.builder()
-                                        .id(comment.getUser().getId())
-                                        .firstName(comment.getUser().getFirstName())
-                                        .lastName(comment.getUser()
-                                                .getLastName())
-                                        .profilePic(comment.getUser().getImage())
-                                        .email(comment.getUser().getEmail())
-                                        .build())
-                                .commentLikes(comment.getLiked().stream().map(User::getId).toList())
-                                .build()).toList()
+                .comments(comments.stream().map(comment -> {
+                            boolean isThisLikeByCurrentUser = comment.getLiked().stream().anyMatch(u -> u.getId().equals(loggedInUser.getId()));
+                            return CommentResponse.builder()
+                                    .commentId(comment.getId())
+                                    .content(comment.getContent())
+                                    .createAt(comment.getCommentCreatedAt())
+                                    .isLiked(isThisLikeByCurrentUser)
+                                    .commentUserDetails(CommentUserDetails.builder()
+                                            .id(comment.getUser().getId())
+                                            .firstName(comment.getUser().getFirstName())
+                                            .lastName(comment.getUser()
+                                                    .getLastName())
+                                            .profilePic(comment.getUser().getImage())
+                                            .email(comment.getUser().getEmail())
+                                            .build())
+                                    .commentLikes(comment.getLiked().stream().map(User::getId).toList())
+                                    .build();
+                        }).toList()
                 )
                 .build();
     }

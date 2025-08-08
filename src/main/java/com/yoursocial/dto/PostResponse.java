@@ -25,10 +25,10 @@ public class PostResponse {
     private Boolean isUpdated;
 
     @Builder.Default
-    private Boolean isLiked=false;
+    private Boolean isLiked = false;
     @Builder.Default
-    private Boolean isSaved=false;
-    
+    private Boolean isSaved = false;
+
     private Integer postLikesCount;
     private Integer commentsCount;
     private Integer savesCount;
@@ -50,6 +50,9 @@ public class PostResponse {
         private CommentUserDetails commentUserDetails;
         @Builder.Default
         private List<Integer> commentLikes = new ArrayList<>();
+
+        @Builder.Default
+        private Boolean isLiked = false;
     }
 
     @AllArgsConstructor
