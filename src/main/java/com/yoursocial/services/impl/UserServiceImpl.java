@@ -13,6 +13,7 @@ import com.yoursocial.util.CommonUtil;
 import com.yoursocial.util.EmailSendingTemplate;
 import jakarta.mail.MessagingException;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.util.ObjectUtils;
@@ -25,7 +26,9 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.yoursocial.util.AppConstant.OTP_EXPIRATION_MINUTES;
+import static com.yoursocial.util.AppConstant.PASSWORD_FINAL_LENGTH;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
@@ -186,6 +189,7 @@ public class UserServiceImpl implements UserService {
 
         String body = EmailSendingTemplate.sendEmailForPasswordReset(user.getFirstName(), otp);
         emailService.sendEmail(user.getEmail(), "Reset password Your Social Account", body);
+        log.info("User email:{} OTP Code: {}", user.getEmail(), otp);
 
         user.setResetPasswordCode(otp);
         user.setOtpGeneratedTime(LocalDateTime.now());
@@ -223,6 +227,9 @@ public class UserServiceImpl implements UserService {
 
         if (user.getResetPasswordCode() == null) {
             throw new ResetPasswordException("Password reset not initialized or OTP has expired");
+        }
+        if (request.getNewPassword().length() < PASSWORD_FINAL_LENGTH) {
+            throw new ResetPasswordException("Password must contain 8 characters");
         }
 
         user.setPassword(passwordEncoder.encode(request.getNewPassword()));

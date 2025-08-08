@@ -27,6 +27,7 @@ public class ReelResponse {
         private Integer authorId;
         private String authorEmail;
         private String fullName;
+        private String image;
 
         @Builder.Default
         private List<Integer> followers = new ArrayList<>();

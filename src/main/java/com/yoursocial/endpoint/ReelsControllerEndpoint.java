@@ -13,7 +13,7 @@ ReelsControllerEndpoint {
     @PostMapping("/create")
     public ResponseEntity<?> createReel(@RequestBody ReelRequest request);
 
-    @GetMapping("/all") // only for admin
+    @GetMapping("/all") // for all user
     public ResponseEntity<?> getAllReel();
 
     @GetMapping("/user/all")

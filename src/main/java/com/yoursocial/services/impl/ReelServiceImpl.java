@@ -38,7 +38,7 @@ public class ReelServiceImpl implements ReelService {
         Reel isReelSaved = reelRepository.save(reel);
 
         ReelResponse response = null;
-        if (!ObjectUtils.isEmpty(isReelSaved)){
+        if (!ObjectUtils.isEmpty(isReelSaved)) {
             response = ReelResponse.builder()
                     .createdAt(isReelSaved.getCreatedAt())
                     .title(isReelSaved.getTitle())
@@ -111,6 +111,7 @@ public class ReelServiceImpl implements ReelService {
                 .authorId(user.getId())
                 .authorEmail(user.getEmail())
                 .fullName(user.getFirstName() + " " + user.getLastName())
+                .image(user.getImage())
                 .following(user.getFollowing())
                 .followers(user.getFollowers())
                 .build();
