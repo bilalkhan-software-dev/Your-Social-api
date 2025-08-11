@@ -4,6 +4,7 @@ import com.yoursocial.config.security.CustomUserDetails;
 import com.yoursocial.dto.*;
 import com.yoursocial.entity.User;
 import com.yoursocial.exception.ExistDataException;
+import com.yoursocial.exception.ResourceNotFoundException;
 import com.yoursocial.repository.UserRepository;
 import com.yoursocial.services.AuthService;
 import com.yoursocial.services.JwtService;
@@ -48,17 +49,21 @@ public class AuthServiceImpl implements AuthService {
         mappedUser.setPassword(passwordEncoder.encode(user.getPassword()));
         mappedUser.setBio("Hey there! I'm new here. More about me coming soon.");
 
-//        mappedUser.setImage("https://res.cloudinary.com/dkkgqafqw/image/upload/v1748716426/c20bf2b8-6e3a-4a18-8e69-63ebfe519f0d.png");
         mappedUser.setBanner("https://t4.ftcdn.net/jpg/08/50/30/01/360_F_850300178_2R0d9z8EiG6hN8Yj5QaBEYJAEVFflJly.jpg");
         User saved = userRepository.save(mappedUser);
         log.info("User registered  with username :{} and details :{}", user.getEmail(), user);
         return !ObjectUtils.isEmpty(saved);
     }
+
     @Override
     public LoginResponse login(LoginRequest user) {
 
         String username = user.getEmail();
         String password = user.getPassword();
+
+        userRepository.findByEmail(username).orElseThrow(
+                () -> new ResourceNotFoundException("Email is not registered!")
+        );
         Authentication authenticate = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
 
         if (authenticate.isAuthenticated()) {

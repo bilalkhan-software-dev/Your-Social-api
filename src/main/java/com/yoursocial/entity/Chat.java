@@ -27,7 +27,7 @@ public class Chat {
     @ManyToMany
     private List<User> users = new ArrayList<>();
 
-    @OneToMany(mappedBy = "chat")
+    @OneToMany(mappedBy = "chat",cascade = {CascadeType.MERGE,CascadeType.PERSIST,CascadeType.REMOVE},orphanRemoval = true)
     @JsonIgnore
     private List<Message> messages = new ArrayList<>();
 

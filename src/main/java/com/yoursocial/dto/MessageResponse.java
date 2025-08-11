@@ -20,6 +20,9 @@ public class MessageResponse {
     private MessageUserDetails messageUserDetails;
     private ChatResponse chatDetails;
 
+    private Boolean isUpdated = false;
+    private Boolean isDeleted = false;
+
     @Data
     @Builder
     @AllArgsConstructor

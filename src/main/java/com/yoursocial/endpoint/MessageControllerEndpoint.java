@@ -2,6 +2,7 @@ package com.yoursocial.endpoint;
 
 
 import com.yoursocial.dto.MessageRequest;
+import com.yoursocial.dto.MessageUpdateRequest;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -13,6 +14,13 @@ public interface MessageControllerEndpoint {
 
     @GetMapping("/chat/{chatId}")
     public ResponseEntity<?> getAllMessageOfTheChat(@PathVariable Integer chatId);
+
+
+    @PutMapping("/update/{chatId}/{messageId}")
+    public ResponseEntity<?> updateMessage(@PathVariable Integer chatId,@PathVariable Integer messageId,@RequestBody MessageUpdateRequest messageRequest);
+
+    @PutMapping("/delete/{chatId}/{messageId}")
+    public ResponseEntity<?> deleteMessage(@PathVariable Integer chatId,@PathVariable Integer messageId);
 
 
 }

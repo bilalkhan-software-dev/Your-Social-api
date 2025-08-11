@@ -4,6 +4,7 @@ import com.yoursocial.dto.ChatResponse;
 import com.yoursocial.dto.MessageRequest;
 import com.yoursocial.dto.MessageResponse;
 import com.yoursocial.dto.MessageResponse.MessageUserDetails;
+import com.yoursocial.dto.MessageUpdateRequest;
 import com.yoursocial.entity.Chat;
 import com.yoursocial.entity.Message;
 import com.yoursocial.entity.User;
@@ -15,9 +16,11 @@ import com.yoursocial.util.CommonUtil;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Service;
+import org.springframework.util.ObjectUtils;
 
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 
 @Service
@@ -63,6 +66,60 @@ public class MessageServiceImpl implements MessageService {
         return messages.stream()
                 .map(this::getMessageResponse)
                 .toList();
+    }
+
+    @Override
+    public MessageResponse updateMessage(Integer chatId, Integer messageId, MessageUpdateRequest messageRequest) {
+
+        Chat chat = chatRepository.findById(chatId).orElseThrow(
+                () -> new ResourceNotFoundException("Chat not found with id: " + chatId)
+        );
+        Message message = messageRepository.findById(messageId).orElseThrow(
+                () -> new ResourceNotFoundException("Message not found with id: " + messageId)
+        );
+
+        // Check if message is older than 24 hours
+        if (message.getMessageCreatedAt().isBefore(LocalDateTime.now().minusHours(24))) {
+            throw new IllegalArgumentException("You can't update messages after 24 hours");
+        }
+
+        // Check if current user is the author of the message
+        boolean isAuthor = chat.getUsers().stream()
+                .anyMatch(user -> user.getId().equals(message.getUser().getId()));
+        if (!isAuthor) {
+            throw new IllegalArgumentException("You are not allowed to update this message");
+        }
+
+        // Update message content if provided
+        if (messageRequest.getContent() != null && !messageRequest.getContent().isEmpty()) {
+            message.setContent(messageRequest.getContent());
+        }
+
+        Message savedMessage = messageRepository.save(message);
+        MessageResponse response = getMessageResponse(savedMessage);
+        response.setIsUpdated(!savedMessage.equals(message)); // true if changes were made
+        return response;
+    }
+
+    @Override
+    public MessageResponse deleteMessage(Integer chatId, Integer messageId) {
+
+        Chat chat = chatRepository.findById(chatId).orElseThrow(
+                () -> new ResourceNotFoundException("Chat not found with id: " + chatId)
+        );
+        Message message = messageRepository.findById(messageId).orElseThrow(
+                () -> new ResourceNotFoundException("Message not found with id: " + messageId)
+        );
+        boolean b = chat.getUsers().stream().anyMatch(user -> user.getId().equals(message.getUser().getId()));
+        if (b) {
+            throw new IllegalArgumentException("You are not allowed to delete this message");
+        }
+        message.setContent("This message has been deleted");
+        message.setMessageCreatedAt(LocalDateTime.now());
+        Message isDeleted = messageRepository.save(message);
+        MessageResponse response = getMessageResponse(isDeleted);
+        response.setIsDeleted(!isDeleted.equals(message));
+        return response;
     }
 
     private MessageResponse getMessageResponse(Message message) {
