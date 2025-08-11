@@ -41,7 +41,7 @@ public class MessageController implements MessageControllerEndpoint {
         List<MessageResponse> chatMessages = messageService.findChatMessage(chatId);
 
         if (CollectionUtils.isEmpty(chatMessages)) {
-            return response.createBuildResponse("No Message were created between chats",chatMessages,HttpStatus.OK);
+            return response.createBuildResponse("No Message were created between chats", chatMessages, HttpStatus.OK);
         }
 
         return response.createBuildResponse("Messages  retrieved successfully!", chatMessages, HttpStatus.OK);
