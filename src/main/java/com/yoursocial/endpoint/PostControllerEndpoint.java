@@ -2,9 +2,11 @@ package com.yoursocial.endpoint;
 
 
 import com.yoursocial.dto.PostRequest;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Post",description = "Create,read,update,delete,save and like post")
 @RequestMapping("/api/v1/post")
 public interface PostControllerEndpoint {
 

@@ -3,9 +3,11 @@ package com.yoursocial.endpoint;
 
 import com.yoursocial.dto.MessageRequest;
 import com.yoursocial.dto.MessageUpdateRequest;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@Tag(name = "Message",description = "Send messages to other user")
 @RequestMapping("/api/v1/message")
 public interface MessageControllerEndpoint {
 

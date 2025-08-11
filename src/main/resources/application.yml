@@ -35,8 +35,48 @@ spring:
           auth: true
           starttls:
             enable: true
+---
+spring:
+  config:
+    activate:
+      on-profile: prod
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: ${SQL_URL}
+    username: ${SQL_USERNAME}
+    password: ${SQL_PASSWORD}
+  jpa:
+    hibernate:
+      ddl-auto: update
+    properties:
+      hibernate:
+        show_sql: true
+  mail:
+    host: smtp.gmail.com
+    username: ${EMAIL_USERNAME}
+    password: ${EMAIL_PASSWORD}
+    port: 587
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+---
+springdoc:
+  swagger-ui:
+    operations-sorter: method
+    tags-sorter: alpha
+    path: /your-social-doc
+  api-docs:
+    path: /your-social-api-doc
+management:
+  endpoints:
+    web:
+      exposure:
+        include: '*'
+---
 
-# custom properties for verify email url
 website:
   base:
     url: ${BASE_URL:http://localhost:8081}

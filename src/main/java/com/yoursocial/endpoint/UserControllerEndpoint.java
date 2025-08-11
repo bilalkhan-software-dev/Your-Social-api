@@ -1,13 +1,12 @@
 package com.yoursocial.endpoint;
 
-import com.yoursocial.dto.ResetPasswordRequest;
 import com.yoursocial.dto.UpdateUserRequest;
-import jakarta.mail.MessagingException;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.io.UnsupportedEncodingException;
 
+@Tag(name = "User", description = "Users related API's")
 @RequestMapping("/api/v1/user") // required authentication
 public interface UserControllerEndpoint {
 
@@ -32,14 +31,6 @@ public interface UserControllerEndpoint {
 
     @GetMapping("/{userId}")
     public ResponseEntity<?> getUserDetailsById(@PathVariable Integer userId);
-
-
-
-
-
-
-
-
 
 
 }

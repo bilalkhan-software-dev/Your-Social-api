@@ -3,12 +3,14 @@ package com.yoursocial.endpoint;
 import com.yoursocial.dto.LoginRequest;
 import com.yoursocial.dto.ResetPasswordRequest;
 import com.yoursocial.dto.UserRequest;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.mail.MessagingException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.UnsupportedEncodingException;
 
+@Tag(name = "Authentication",description = "Authenticate user API's")
 @RequestMapping("/api/v1/auth") // not required authentication
 public interface AuthControllerEndpoint {
 
