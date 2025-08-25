@@ -1,7 +1,7 @@
 # **YourSocial Backend API Documentation**  
 **🚀 Spring Boot REST API for Social Media Platform**  
 
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.1-green)](https://spring.io/)
+[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.4.5-green)](https://spring.io/)
 [![Java](https://img.shields.io/badge/Java-17-blue)](https://www.oracle.com/java/)
 [![JWT](https://img.shields.io/badge/JWT-Auth-orange)](https://jwt.io/)
 
